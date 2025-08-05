@@ -1,13 +1,7 @@
 import ballerina/http;
 import ballerinax/mongodb;
 
-// For MongoDB Atlas, use connection string instead
-configurable string connectionString = ?;
-
-final mongodb:Client mongoDb = check new ({
-    connection: connectionString
-});
-
+// Import shared database configuration
 public type TestDoc record {|
     json _id;
     int testdata;
@@ -26,14 +20,9 @@ public type TestDoc record {|
 
 
 service on new http:Listener(9091) {
-    private final mongodb:Database myDb;
-
-    function init() returns error? {
-        self.myDb = check mongoDb->getDatabase("ballerina");
-    }
 
     resource function get data() returns TestDoc[]|error {
-        mongodb:Collection collection = check self.myDb->getCollection("test");
+        mongodb:Collection collection = check myDb->getCollection("test");
         stream<TestDoc, error?> result = check collection->find();
         return from TestDoc doc in result
             select doc;
