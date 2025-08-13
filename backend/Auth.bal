@@ -96,7 +96,7 @@ service /auth on new http:Listener(9092) {
     }
 
     private function hashPassword(string password) returns string|error {
-        byte[] hashedBytes = check crypto:hashSha256(password.toBytes());
+        byte[] hashedBytes = crypto:hashSha256(password.toBytes());
         return hashedBytes.toBase16();
     }
 
