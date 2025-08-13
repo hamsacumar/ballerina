@@ -1,0 +1,16 @@
+<h2>Enter Verification Code for forgot password</h2>
+  <p>We sent a 6-digit code to your Gmail.</p>
+
+  <form action="reset-password.html" method="get">
+    <div class="code-container">
+      <input type="text" maxlength="1" class="code-input" required>
+      <input type="text" maxlength="1" class="code-input" required>
+      <input type="text" maxlength="1" class="code-input" required>
+      <input type="text" maxlength="1" class="code-input" required>
+      <input type="text" maxlength="1" class="code-input" required>
+      <input type="text" maxlength="1" class="code-input" required>
+    </div>
+    <br>
+  <button (click)="navigateTo('login')" class="secondary-button">Send Code</button>
+
+  </form>
