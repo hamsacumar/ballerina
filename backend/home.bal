@@ -198,7 +198,7 @@ service /api on new http:Listener(9094) {
 
     // =============== CATEGORY CRUD OPERATIONS ===============
 
-    // Create a new category
+    // create category function
     resource function post categories(@http:Header string Authorization, CategoryRequest categoryData)
             returns json|http:BadRequest|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
