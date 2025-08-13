@@ -5,10 +5,8 @@ import ballerina/crypto;
 import ballerina/time;
 
 // Configuration - same as main.bal
-configurable string jwtSecret = "your-secret-key-here-at-least-32-characters-long";
-configurable string jwtIssuer = "ballerina-app";
-
-
+configurable string jwtSecret = ?;
+configurable string jwtIssuer = ?;
 
 // Types
 public type User record {|
@@ -72,7 +70,7 @@ service /auth on new http:Listener(9092) {
     }
 
     private function hashPassword(string password) returns string|error {
-        byte[] hashedBytes = check crypto:hashSha256(password.toBytes());
+        byte[] hashedBytes = crypto:hashSha256(password.toBytes());
         return hashedBytes.toBase16();
     }
 
