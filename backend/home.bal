@@ -1,5 +1,5 @@
 import ballerina/http;
-import ballerina/jwt;
+import ballerinax/mongodb;
 import ballerina/time;
 import ballerinax/mongodb;
 
@@ -141,7 +141,64 @@ service /api on new http:Listener(9094) {
         return ();
     }
 
-    // Utility function to extract domain from URL
+    // Utility function to verify JWT token and get user ID
+    private function verifyTokenAndGetUserId(string authHeader) returns map<json>|http:Unauthorized|http:Forbidden|error {
+        jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(authHeader);
+        if authn is http:Unauthorized {
+            return authn;
+        }
+
+        http:Forbidden? authz = self.jwtHandler.authorize(<jwt:Payload>authn, ["admin", "user"]);
+        if authz is http:Forbidden {
+            return authz;
+        }
+
+        jwt:Payload payload = <jwt:Payload>authn;
+        string? username = <string?>payload["username"];
+
+        if username is () {
+            return error("Invalid token: missing username");
+        }
+
+        // Get user ID from users collection with proper error handling
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+
+        // Use a more specific filter and handle the result properly
+        stream<record {|json _id; anydata...;|}, error?> userStream =
+            check userCollection->find({username: username}, projection = {"_id": 1});
+
+        record {|json _id; anydata...;|}[] users = [];
+        check userStream.forEach(function(record {|json _id; anydata...;|} user) {
+            users.push(user);
+        });
+
+        if users.length() == 0 {
+            return error("User not found");
+        }
+
+        // Return the ObjectId as a map
+        json userId = users[0]._id;
+        if userId is map<json> {
+            return userId;
+        } else {
+            return error("Invalid user ID format");
+        }
+    }
+
+    // Utility function to convert string ID to ObjectId format
+    private function createObjectId(string id) returns map<json> {
+        return {"$oid": id};
+    }
+
+    // Utility function to extract ObjectId string from json
+    private function extractObjectId(json id) returns string? {
+        if id is map<json> && id["$oid"] is string {
+            return <string>id["$oid"];
+        }
+        return ();
+    }
+
+    // Utility function to extract domain from url
     private function extractDomain(string inputUrl) returns string|error {
         string cleanUrl = inputUrl;
         if (cleanUrl.startsWith("http://")) {
@@ -329,8 +386,58 @@ service /api on new http:Listener(9094) {
                     updatedAt: time:utcToString(time:utcNow())
                 }
             };
+    resource function put categories/[string categoryId](@http:Header string Authorization, CategoryUpdate updateData)
+            returns json|http:BadRequest|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
-            mongodb:UpdateResult _ = check categoryCollection->updateOne({_id: objectId, userId: userId}, updateOperation);
+        map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
+        if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
+            return userIdResult;
+        }
+        if userIdResult is error {
+            return <http:InternalServerError>{body: {"message": "Authentication failed"}};
+        }
+
+        map<json> userId = <map<json>>userIdResult;
+
+        do {
+            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+
+            if (updateData.name.trim().length() == 0) {
+                return <http:BadRequest>{body: {"message": "Category name cannot be empty"}};
+            }
+
+            map<json> objectId = self.createObjectId(categoryId);
+
+            // Check if category exists and belongs to user
+            stream<record {|anydata...;|}, error?> existingStream =
+                check categoryCollection->find({_id: objectId, userId: userId});
+
+            record {|anydata...;|}[] existing = [];
+            check existingStream.forEach(function(record {|anydata...;|} cat) {
+                existing.push(cat);
+            });
+
+            if (existing.length() == 0) {
+                return <http:NotFound>{body: {"message": "Category not found"}};
+            }
+
+            mongodb:Update updateOperation = {
+                set: {
+                    name: updateData.name.trim(),
+                    updatedAt: time:utcToString(time:utcNow())
+                }
+            };
+
+        mongodb:UpdateResult|error updateResult = categoryCollection->updateOne(
+            {_id: categoryId},
+            updateOperation
+        );
+
+        if (updateResult is error) {
+            return <http:InternalServerError>{
+                body: {"message": "Failed to update category"}
+            };
+        }
 
             return {"message": "Category updated successfully"};
         } on fail var e {
@@ -374,8 +481,13 @@ service /api on new http:Listener(9094) {
             // Delete all links in this category
             mongodb:DeleteResult _ = check linkCollection->deleteMany({categoryId: objectId, userId: userId});
 
-            // Delete the category
-            mongodb:DeleteResult _ = check categoryCollection->deleteOne({_id: objectId, userId: userId});
+        // Delete the category
+        mongodb:DeleteResult|error categoryDeleteResult = categoryCollection->deleteOne({_id: categoryId});
+        if (categoryDeleteResult is error) {
+            return <http:InternalServerError>{
+                body: {"message": "Failed to delete category"}
+            };
+        }
 
             return {"message": "Category and associated links deleted successfully"};
         } on fail var e {
