@@ -19,7 +19,7 @@ public type Link record {|
     string url;
     string icon?;
     json categoryId; // Changed to json to handle ObjectId
-    json userId; // Changed to json to handle ObjectId
+    json userId; 
     string createdAt?;
     string updatedAt?;
 |};
