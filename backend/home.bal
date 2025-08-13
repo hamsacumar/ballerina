@@ -31,7 +31,7 @@ public type CategoryRequest record {|
 public type LinkRequest record {|
     string name;
     string url;
-    string categoryId; // String input, will be converted to ObjectId
+    string categoryId; 
 |};
 
 public type CategoryUpdate record {|
