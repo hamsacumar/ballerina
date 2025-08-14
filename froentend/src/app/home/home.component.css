@@ -63,7 +63,7 @@
 .link-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   padding: 8px;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -103,7 +103,7 @@
 
 .add-link-inline button {
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: 5px;
 }
 
@@ -172,4 +172,60 @@
     bottom: 80px;
     right: 20px;
   }
+}
+
+/* Link items styling to match screenshot */
+.link-item {
+  display: inline-block;
+  margin: 8px;
+}
+
+.link-button {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.link-button:hover {
+  background-color: #f5f5f5;
+}
+
+.link-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.link-name {
+  font-size: 12px;
+  text-align: center;
+  max-width: 80px;
+  word-break: break-word;
+}
+
+/* Category headers */
+.category-header h2 {
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 16px 0 8px 0;
+}
+
+/* See more button */
+.see-more {
+  text-align: center;
+  margin: 16px 0;
+}
+
+.see-more button {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #529511;
 }

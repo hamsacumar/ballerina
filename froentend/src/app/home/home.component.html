@@ -13,36 +13,39 @@
   </div>
 
   <!-- ALL LINKS SECTION -->
-  <section *ngIf="allLinks.length" class="category-block">
-    <div class="category-header">
-      <h2>All</h2>
-    </div>
+<!-- ALL LINKS SECTION -->
+<section class="category-block">
+  <div class="category-header">
+    <h2>ALL</h2>
+  </div>
 
-    <div class="links-grid">
-      <div *ngFor="let l of visibleLinks('all')" class="link-card">
-        <button class="link-icon" (click)="window.open(l.url, '_blank')" title="{{l.name}}">
-          <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
-        </button>
-        <div class="link-name">{{ l.name }}</div>
-      </div>
+  <div class="links-grid">
+    <div *ngFor="let l of visibleLinks('all')" class="link-item">
+      <button class="link-button" (click)="window.open(l.url, '_blank')">
+        <img [src]="l.icon" alt="" class="link-icon">
+        <span class="link-name">{{ l.name }}</span>
+      </button>
     </div>
+  </div>
 
-    <div class="see-more" *ngIf="visibleLinks('all').length < allLinks.length">
-      <button mat-button (click)="seeMore('all')">See more</button>
-    </div>
+  <div class="see-more" *ngIf="visibleLinks('all').length < allLinks.length">
+    <button mat-button (click)="seeMore('all')">SEE MORE</button>
+  </div>
+</section>
+
 
     <!-- Add Link Button for "All" -->
     <div class="add-link-container">
-      <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
-        <div class="button-content">
-          <div class="circle-icon">
-            <mat-icon>add</mat-icon>
-          </div>
-          <span class="button-text">Add Link</span>
+    <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
+      <div class="button-content">
+        <div class="circle-icon">
+          <mat-icon>add</mat-icon>
         </div>
-      </button>
+        <span class="button-text">Add Link</span>
+      </div>
+    </button>
     </div>
-  </section>
+  
 
   <!-- CATEGORY LOOP -->
 <section *ngFor="let cat of categories" class="category-block">

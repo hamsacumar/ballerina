@@ -113,14 +113,62 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  openAddLinkDialog(cat?: Category) {
-    if (!cat) return; // Cannot add to All
-    const dialogRef = this.dialog.open(AddLinkDialogComponent, { width: '400px', data: { categoryId: cat._id } });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && cat._id) this.loadLinks(cat._id);
-    });
-  }
+  // Add this to your component state
+uncategorizedLinks: Link[] = [];
 
+// Modify getAllLinks() method
+get getAll(): Link[] {
+  return [...this.uncategorizedLinks, ...Object.values(this.linksMap).flat()];
+}
+
+
+
+loadAllLinks() {
+  this.linkService.getAll().subscribe({
+    next: (links) => {
+      // Separate uncategorized links
+      this.uncategorizedLinks = links.filter(link => !link.categoryId);
+      
+      // Group categorized links
+      this.categories.forEach(cat => {
+        this.linksMap[cat._id!] = links.filter(link => 
+          link.categoryId === cat._id
+        );
+      });
+    }
+  });
+}
+
+// Update openAddLinkDialog
+openAddLinkDialog(cat?: Category) {
+  const dialogRef = this.dialog.open(AddLinkDialogComponent, { 
+    width: '400px',
+    data: { 
+      mode: 'create',
+      categoryId: cat?._id 
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.linkService.create({
+        name: result.name,
+        url: result.url,
+        categoryId: result.categoryId || undefined
+      }).subscribe({
+        next: () => {
+          if (result.categoryId) {
+            this.loadLinks(result.categoryId);
+          } else {
+            this.loadAllLinks(); // Refresh uncategorized links
+          }
+        },
+        error: (err) => console.error('Error adding link', err)
+      });
+    }
+  });
+}
+  
   openEditLink(catId: string, link: Link) {
     const dialogRef = this.dialog.open(AddLinkDialogComponent, { width: '400px', data: { ...link } });
     dialogRef.afterClosed().subscribe(result => {
