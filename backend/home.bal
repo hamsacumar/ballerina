@@ -18,8 +18,8 @@ public type Link record {|
     string name;
     string url;
     string icon?;
-    json categoryId; 
-    json userId; 
+    json categoryId; // Changed to json to handle ObjectId
+    json userId; // Changed to json to handle ObjectId
     string createdAt?;
     string updatedAt?;
 |};
@@ -31,7 +31,7 @@ public type CategoryRequest record {|
 public type LinkRequest record {|
     string name;
     string url;
-    string categoryId; 
+    string categoryId; // String input, will be converted to ObjectId
 |};
 
 public type CategoryUpdate record {|
