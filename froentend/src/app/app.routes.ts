@@ -5,14 +5,11 @@ import { HomeComponent } from './home/home.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { AddLinkDialogComponent } from './shared/add-link-dialog/add-link-dialog.component';
 
+import { LandingpageComponent } from './landingpage/landingpage.component';
 
 export const routes: Routes = [
-    {
-    path: 'test',
-    component: TestComponent // ✅ directly reference the standalone component
-  },
-
-  {
+  { path: 'test', component: TestComponent },
+{
     path: 'header',
     component: HeaderComponent // ✅ directly reference the standalone component
   },
@@ -31,9 +28,8 @@ export const routes: Routes = [
     component: AddLinkDialogComponent // ✅ directly reference the standalone component
   },
 
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
-  }
+
+
+  { path: '', component: LandingpageComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
