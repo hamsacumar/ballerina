@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { HeaderComponent } from '../shared/header/header.component';
 import { FooterComponent } from '../shared/footer/footer.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon'; // Add this import
-
 import { AddCategoryDialogComponent } from '../shared/add-category-dialog/add-category-dialog.component';
 import { AddLinkDialogComponent } from '../shared/add-link-dialog/add-link-dialog.component';
+import { CategoryService } from '../service/category.service';
+import { LinkService } from '../service/link.service';
+import { Category } from '../model/category.model';
+import { Link } from '../model/link.model';
+import { MatMenuModule } from '@angular/material/menu';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -16,39 +20,117 @@ import { AddLinkDialogComponent } from '../shared/add-link-dialog/add-link-dialo
     HeaderComponent,
     FooterComponent,
     MatButtonModule,
-    MatIconModule, // Add this to imports array
+    MatIconModule,
+      MatMenuModule, // <-- ADD THIS for mat-menu
 
+        
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-  constructor(private dialog: MatDialog) {}
+export class HomeComponent implements OnInit {
+    window = window; // now usable in template
+
+  categories: Category[] = [];
+  linksMap: Record<string, Link[]> = {};
+  visibleCount: Record<string, number> = {};
+  loading = { categories: false, links: {} as Record<string, boolean> };
+
+  constructor(
+    private dialog: MatDialog,
+    private categoryService: CategoryService,
+    private linkService: LinkService
+  ) {}
+
+  ngOnInit() {
+    this.loadCategories();
+    // Initialize "All" category visibleCount
+    this.visibleCount['all'] = 6;
+  }
+
+  loadCategories() {
+    this.loading.categories = true;
+    this.categoryService.getAll().subscribe({
+      next: (cats: Category[]) => {
+        this.categories = cats;
+
+        // Initialize visibleCount per category
+        cats.forEach(cat => this.visibleCount[cat._id || ''] = 6);
+
+        // Load links per category
+        cats.forEach(cat => {
+          if (cat._id) this.loadLinks(cat._id);
+        });
+
+        this.loading.categories = false;
+      },
+      error: () => { this.loading.categories = false; }
+    });
+  }
+
+  loadLinks(categoryId: string) {
+    this.loading.links[categoryId] = true;
+    this.linkService.getByCategory(categoryId).subscribe({
+      next: (links: Link[]) => {
+        this.linksMap[categoryId] = links;
+        this.loading.links[categoryId] = false;
+      },
+      error: () => { this.loading.links[categoryId] = false; }
+    });
+  }
+
+  // Merge all links for "All" virtual category
+  get allLinks(): Link[] {
+    return Object.values(this.linksMap).flat();
+  }
+
+  visibleLinks(categoryId: string): Link[] {
+    if (categoryId === 'all') return this.allLinks.slice(0, this.visibleCount['all'] || 6);
+    return this.linksMap[categoryId]?.slice(0, this.visibleCount[categoryId] || 6) || [];
+  }
+
+  seeMore(categoryId: string) {
+    this.visibleCount[categoryId] = (this.visibleCount[categoryId] || 6) + 6;
+  }
 
   openAddCategoryDialog() {
-    const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
-      width: '400px',
-      data: { name: '' }
-    });
-
+    const dialogRef = this.dialog.open(AddCategoryDialogComponent, { width: '400px', data: { name: '' } });
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('New category:', result.name);
-        // Handle the saved category here
-      }
-    });
-  }
- openAddLinkDialog(): void {
-    const dialogRef = this.dialog.open(AddLinkDialogComponent, {
-      width: '400px'
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('New link:', result);
-        // Handle the saved link here
-      }
+      if (result) this.categoryService.create(result).subscribe(() => this.loadCategories());
     });
   }
 
+  openEditCategory(cat: Category) {
+    const dialogRef = this.dialog.open(AddCategoryDialogComponent, { width: '400px', data: { ...cat } });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.categoryService.update(cat._id || '', result).subscribe(() => this.loadCategories());
+    });
+  }
+
+  deleteCategory(cat: Category) {
+    if (confirm(`Delete category "${cat.name}"?`)) {
+      this.categoryService.remove(cat._id || '').subscribe(() => this.loadCategories());
+    }
+  }
+
+  openAddLinkDialog(cat?: Category) {
+    if (!cat) return; // Cannot add to All
+    const dialogRef = this.dialog.open(AddLinkDialogComponent, { width: '400px', data: { categoryId: cat._id } });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && cat._id) this.loadLinks(cat._id);
+    });
+  }
+
+  openEditLink(catId: string, link: Link) {
+    const dialogRef = this.dialog.open(AddLinkDialogComponent, { width: '400px', data: { ...link } });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadLinks(catId);
+    });
+  }
+
+  deleteLink(catId: string, link: Link) {
+    if (confirm(`Delete link "${link.name}"?`)) {
+      this.linkService.remove(link._id || '').subscribe(() => this.loadLinks(catId));
+    }
+  }
 }

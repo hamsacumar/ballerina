@@ -1,5 +1,6 @@
 <app-header></app-header>
 <div class="home-container">
+
   <!-- Header Section -->
   <div class="header1-text">
     <h1>Tab Wallet</h1>
@@ -10,31 +11,98 @@
   <div class="search-placeholder">
     search......
   </div>
-    
-  <div class="categories-section">
-    <h2 class="category-title">All</h2>
-    
-    <!-- Add Link Button - Placed under "All" heading -->
-<div class="add-link-container">
-  <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
-    <div class="button-content">
-      <div class="circle-icon">
-        <mat-icon>add</mat-icon>
-      </div>
-      <span class="button-text">Add Link</span>
+
+  <!-- ALL LINKS SECTION -->
+  <section *ngIf="allLinks.length" class="category-block">
+    <div class="category-header">
+      <h2>All</h2>
     </div>
-  </button>
-</div>
-  
-<!-- Add Category Button - Bottom right floating position -->
-<div class="add-category-container floating-position">
-  <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
-    <div class="button-content">
-      <div class="circle-icon">
-        <mat-icon>add</mat-icon>
+
+    <div class="links-grid">
+      <div *ngFor="let l of visibleLinks('all')" class="link-card">
+        <button class="link-icon" (click)="window.open(l.url, '_blank')" title="{{l.name}}">
+          <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
+        </button>
+        <div class="link-name">{{ l.name }}</div>
       </div>
-      <span class="button-text">Add Category</span>
     </div>
-  </button>
+
+    <div class="see-more" *ngIf="visibleLinks('all').length < allLinks.length">
+      <button mat-button (click)="seeMore('all')">See more</button>
+    </div>
+
+    <!-- Add Link Button for "All" -->
+    <div class="add-link-container">
+      <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
+        <div class="button-content">
+          <div class="circle-icon">
+            <mat-icon>add</mat-icon>
+          </div>
+          <span class="button-text">Add Link</span>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- CATEGORY LOOP -->
+<section *ngFor="let cat of categories" class="category-block">
+  <div class="category-header">
+    <h2>{{ cat.name }}</h2>
+
+    <!-- Category Menu -->
+    <button mat-icon-button [matMenuTriggerFor]="catMenu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #catMenu="matMenu">
+      <button mat-menu-item (click)="openEditCategory(cat)">Edit</button>
+      <button mat-menu-item (click)="deleteCategory(cat)">Remove</button>
+    </mat-menu>
+  </div>
+
+  <!-- Add Link button for category -->
+  <div class="add-link-inline">
+    <button mat-stroked-button (click)="openAddLinkDialog(cat)">
+      <mat-icon>add</mat-icon> Add Link
+    </button>
+  </div>
+
+  <!-- Links Grid -->
+  <div class="links-grid">
+    <div *ngFor="let l of visibleLinks(cat._id!)" class="link-card">
+      <button class="link-icon" (click)="window.open(l.url, '_blank')" title="{{l.name}}">
+        <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
+      </button>
+      <div class="link-name">{{ l.name }}</div>
+
+      <!-- Link Menu -->
+      <button mat-icon-button [matMenuTriggerFor]="linkMenu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #linkMenu="matMenu">
+        <button mat-menu-item (click)="openEditLink(cat._id!, l)">Edit</button>
+        <button mat-menu-item (click)="deleteLink(cat._id!, l)">Remove</button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- See More -->
+  <div class="see-more" *ngIf="visibleLinks(cat._id!).length < (linksMap[cat._id!]?.length || 0)">
+    <button mat-button (click)="seeMore(cat._id!)">See more</button>
+  </div>
+</section>
+
+
+  <!-- Floating Add Category Button -->
+  <div class="add-category-container floating-position">
+    <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
+      <div class="button-content">
+        <div class="circle-icon">
+          <mat-icon>add</mat-icon>
+        </div>
+        <span class="button-text">Add Category</span>
+      </div>
+    </button>
+  </div>
+
 </div>
 <app-footer></app-footer>

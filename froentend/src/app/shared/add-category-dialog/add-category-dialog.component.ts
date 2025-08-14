@@ -1,11 +1,16 @@
-
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+
+export interface CategoryDialogData {
+  name?: string;
+  mode: 'create' | 'edit';
+  id?: string;
+}
 
 @Component({
   selector: 'app-add-category-dialog',
@@ -21,17 +26,30 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './add-category-dialog.component.html',
   styleUrls: ['./add-category-dialog.component.css']
 })
-export class AddCategoryDialogComponent {
+export class AddCategoryDialogComponent implements OnInit {
+  categoryName = '';
+
   constructor(
     public dialogRef: MatDialogRef<AddCategoryDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {name: string}
+    @Inject(MAT_DIALOG_DATA) public data: CategoryDialogData
   ) {}
+
+  ngOnInit(): void {
+    if (this.data.mode === 'edit' && this.data.name) {
+      this.categoryName = this.data.name;
+    }
+  }
 
   onCancel(): void {
     this.dialogRef.close();
   }
-  
+
   onSave(): void {
-    this.dialogRef.close(this.data);
+    if (!this.categoryName.trim()) return; // validation
+    this.dialogRef.close({
+      name: this.categoryName.trim(),
+      mode: this.data.mode,
+      id: this.data.id
+    });
   }
 }

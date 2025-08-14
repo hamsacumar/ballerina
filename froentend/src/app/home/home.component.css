@@ -4,8 +4,8 @@
   padding: 2rem;
   text-align: center;
   font-family: 'Arial', sans-serif;
-  position: relative; /* Needed for absolute positioning of floating button */
-  min-height: 70vh; /* Ensure container has enough height */
+  position: relative; /* Needed for floating button */
+  min-height: 70vh;
 }
 
 .header1-text h1 {
@@ -15,11 +15,11 @@
 }
 
 .header1-text p {
-  font-size: 1.0rem;
+  font-size: 1rem;
   color: #858787;
   margin-bottom: 2rem;
   font-weight: 600;
-  }
+}
 
 .search-placeholder {
   padding: 12px 16px;
@@ -29,29 +29,85 @@
   background-color: #f9f9f9;
   font-size: 1.2rem;
   max-width: 500px;
-  margin: 0 auto;
-}
-.paragraph {
-  font-size: 1.2rem;
-  color: #333;
-  margin-top: 50px;
-  text-align:left ;
+  margin: 0 auto 2rem auto;
 }
 
-/* Add these styles to your existing CSS */
-.categories-section {
+/* Categories section */
+.categories-section, .category-block {
   margin-top: 2rem;
   text-align: left;
-  padding-bottom: 10px; /* Space for the floating button */
+  padding-bottom: 10px;
 }
 
-.category-title {
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.category-header h2 {
   font-size: 1.5rem;
   color: #0c0d0c;
-  margin: 0 0 1rem 0;
+  margin: 0;
 }
 
-/* Add category button styles - floating right version */
+/* Links grid */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-gap: 16px;
+  margin-top: 10px;
+}
+
+.link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: #fff;
+  position: relative;
+}
+
+.link-icon {
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.link-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.link-name {
+  font-size: 0.9rem;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* See more button */
+.see-more {
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Add link inline button (per category) */
+.add-link-inline {
+  margin-bottom: 8px;
+}
+
+.add-link-inline button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Add Category floating button */
 .add-category-container.floating-position {
   position: fixed;
   bottom: 120px;
@@ -66,7 +122,6 @@
   min-width: auto;
 }
 
-/* Button content styles (same as your Add Link button) */
 .button-content {
   display: flex;
   flex-direction: column;
@@ -87,73 +142,6 @@
 .circle-icon mat-icon {
   color: white;
   font-size: 24px;
-  height: 24px;
-  width: 24px;
-}
-
-.fixed-add-link-container .button-text {
-  color: #000000 !important;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* Hover effects */
-.add-category-container button:hover .circle-icon {
-  background-color: #114d03;
-}
-
-.add-category-container button:hover .button-text {
-  color: #114d03;
-}
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .floating-add-link-container {
-    padding: 0 1rem;
-  }
-  .floating-add-link-btn {
-    margin-right: 1rem;
-  }
-}
-
-
-
-/* Add link button styles */
-.add-link-container {
-  margin-top: 3%;
-  display: flex;
-  align-items: left;
-}
-
-.add-link-container button {
-  background-color: transparent !important;
-  box-shadow: none !important;
-  padding: 0;
-  min-width: auto;
-
-}
-
-.button-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.circle-icon {
-  width: 40px;
-  height: 40px;
-  background-color: #529511;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.circle-icon mat-icon {
-  color: white;
-  font-size: 24px;
-  height: 24px;
-  width: 24px;
 }
 
 .button-text {
@@ -161,9 +149,27 @@
   font-size: 12px;
   font-weight: 700;
 }
-  .add-link-container button:hover .button-text {
-  color: #e6390e;
+
+/* Hover effects */
+.add-category-container button:hover .circle-icon,
+.add-link-container button:hover .circle-icon,
+.add-link-inline button:hover .circle-icon {
+  background-color: #114d03;
 }
-.add-link-container button:hover .circle-icon {
-  background-color: #e6390e;
+
+.add-category-container button:hover .button-text,
+.add-link-container button:hover .button-text,
+.add-link-inline button:hover .button-text {
+  color: #114d03;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .links-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+  .add-category-container.floating-position {
+    bottom: 80px;
+    right: 20px;
+  }
 }
