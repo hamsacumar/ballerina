@@ -16,7 +16,7 @@ type detailsUser record {
 };
 
 // Link record type from links collection
-type Link record {
+type userLink record {
     string _id?;
     string userId; // Reference to user's _id
     string url;
