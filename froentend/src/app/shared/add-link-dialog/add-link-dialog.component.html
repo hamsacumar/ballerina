@@ -1,0 +1,16 @@
+<h2 mat-dialog-title class="dialog-title">Add shortcut</h2>
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="fill" class="link-field">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="linkData.name">
+  </mat-form-field>
+  
+  <mat-form-field appearance="fill" class="link-field">
+    <mat-label>URL</mat-label>
+    <input matInput [(ngModel)]="linkData.url">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button class="cancel-btn" (click)="onCancel()">Cancel</button>
+  <button mat-button class="done-btn" (click)="onDone()" cdkFocusInitial>Done</button>
+</mat-dialog-actions>

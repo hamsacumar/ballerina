@@ -1,0 +1,40 @@
+<app-header></app-header>
+<div class="home-container">
+  <!-- Header Section -->
+  <div class="header1-text">
+    <h1>Tab Wallet</h1>
+    <p>Build your personal link library</p>
+  </div>
+
+  <!-- Search Placeholder -->
+  <div class="search-placeholder">
+    search......
+  </div>
+    
+  <div class="categories-section">
+    <h2 class="category-title">All</h2>
+    
+    <!-- Add Link Button - Placed under "All" heading -->
+<div class="add-link-container">
+  <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
+    <div class="button-content">
+      <div class="circle-icon">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="button-text">Add Link</span>
+    </div>
+  </button>
+</div>
+  
+<!-- Add Category Button - Bottom right floating position -->
+<div class="add-category-container floating-position">
+  <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
+    <div class="button-content">
+      <div class="circle-icon">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="button-text">Add Category</span>
+    </div>
+  </button>
+</div>
+<app-footer></app-footer>

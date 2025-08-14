@@ -1,0 +1,88 @@
+/* Footer container - Full width and fixed at bottom */
+.footer {
+  background-color: #529511;
+  color: white;
+  padding: 1.0rem 1.5rem;
+  width: 100vw; /* Full viewport width */
+  position: fixed; /* or 'absolute' depending on your layout needs */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box; /* Include padding in width calculation */
+  z-index: 100; /* Ensure it stays above other content */
+}
+
+/* Add this to your styles.css for proper page spacing */
+body {
+  margin: 0;
+  padding-bottom: 80px; /* Match footer height to prevent content hiding */
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Rest of your existing footer styles */
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.company-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.copyright {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-text {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 1rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .footer-left, .footer-right {
+    align-items: center;
+  }
+  
+  body {
+    padding-bottom: 120px; /* More space on mobile */
+  }
+}
