@@ -168,7 +168,7 @@ service /admin on new http:Listener(9093) {
                 sort: {"updatedAt": -1}
             };
 
-            stream<Link, error?> linksStream = check linksCollection->find(linksFilter, linksOptions);
+            stream<userLink, error?> linksStream = check linksCollection->find(linksFilter, linksOptions);
             Link[] userLinks = [];
             
             check linksStream.forEach(function(Link link) {
