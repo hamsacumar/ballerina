@@ -1,0 +1,18 @@
+<div class="login-container">
+  <h2>Login</h2>
+  <form class="login-form">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit" class="login-button">Login</button>
+  </form>
+  <div class="button-group">
+    <button (click)="navigateTo('register')" class="secondary-button">Register</button>
+    <button (click)="navigateTo('forgotpassword')" class="secondary-button">Forgot Password</button>
+  </div>
+</div>
