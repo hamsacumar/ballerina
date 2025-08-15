@@ -1,13 +1,14 @@
+import ballerina/crypto;
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
 import ballerinax/mongodb;
 
-// Type definitions
+//  ========== Type definitions ===========
 public type Category record {|
     json _id?;
     string name;
-    json userId; // Changed to json to handle ObjectId
+    json userId;
     string[] links?;
     string createdAt?;
     string updatedAt?;
@@ -16,10 +17,10 @@ public type Category record {|
 public type Link record {|
     json _id?;
     string name;
-    string url;
+    string hashedUrl;
     string icon?;
-    json categoryId; // Changed to json to handle ObjectId
-    json userId; // Changed to json to handle ObjectId
+    json categoryId?;
+    json userId;
     string createdAt?;
     string updatedAt?;
 |};
@@ -31,7 +32,7 @@ public type CategoryRequest record {|
 public type LinkRequest record {|
     string name;
     string url;
-    string categoryId; // String input, will be converted to ObjectId
+    string? categoryId?;
 |};
 
 public type CategoryUpdate record {|
@@ -84,7 +85,7 @@ service /api on new http:Listener(9094) {
         self.jwtHandler = new (jwtValidatorConfig);
     }
 
-    // FIXED: Utility function to verify JWT token and get user ID
+    // ========== Utility function to verify JWT token and get user ID ===========
     private function verifyTokenAndGetUserId(string authHeader) returns map<json>|http:Unauthorized|http:Forbidden|error {
         jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(authHeader);
         if authn is http:Unauthorized {
@@ -103,7 +104,7 @@ service /api on new http:Listener(9094) {
             return error("Invalid token: missing username");
         }
 
-        // FIXED: Get user ID from users collection with proper error handling
+        // Get user ID from users collection with proper error handling
         mongodb:Collection userCollection = check myDb->getCollection("users");
 
         // Use a more specific filter and handle the result properly
@@ -128,12 +129,12 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Utility function to convert string ID to ObjectId format
+    // ========== Utility function to convert string ID to ObjectId format ===========
     private function createObjectId(string id) returns map<json> {
         return {"$oid": id};
     }
-
-    // Utility function to extract ObjectId string from json
+ 
+    // =========== Utility function to extract ObjectId string from json ===========
     private function extractObjectId(json id) returns string? {
         if id is map<json> && id["$oid"] is string {
             return <string>id["$oid"];
@@ -141,7 +142,18 @@ service /api on new http:Listener(9094) {
         return ();
     }
 
-    // Utility function to extract domain from URL
+    // ========= Hash url function ===========
+    private function hashUrl(string url) returns string|error {
+        byte[] hashedBytes = crypto:hashSha256(url.toBytes());
+        return hashedBytes.toBase64();
+    }
+
+    // ====== Null check  =========
+    isolated function isNullOrEmpty(json? value) returns boolean {
+        return value is () || value == () || value == "";
+    }
+
+    // ========== Utility function to extract domain from URL =========
     private function extractDomain(string inputUrl) returns string|error {
         string cleanUrl = inputUrl;
         if (cleanUrl.startsWith("http://")) {
@@ -163,7 +175,7 @@ service /api on new http:Listener(9094) {
         return cleanUrl;
     }
 
-    // Utility function to generate favicon URL
+    // ======== Utility function to generate favicon URL ==========
     private function generateFaviconUrl(string websiteUrl) returns string {
         string|error domain = self.extractDomain(websiteUrl);
         if (domain is error) {
@@ -172,12 +184,12 @@ service /api on new http:Listener(9094) {
         return string `https://www.google.com/s2/favicons?domain=${domain}`;
     }
 
-    // Health check endpoint
+    // ========= Health check endpoint =========
     resource function get health() returns json {
         return {"status": "healthy", "service": "link-saver", "timestamp": time:utcNow()};
     }
 
-    //Check the valid token
+    // ========= Check the valid token =========
     resource function get debug/token(@http:Header string Authorization) returns json {
         do {
             jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(Authorization);
@@ -198,8 +210,8 @@ service /api on new http:Listener(9094) {
 
     // =============== CATEGORY CRUD OPERATIONS ===============
 
-    // FIXED: Create a new category
-    resource function post categories(@http:Header string Authorization, CategoryRequest categoryData)
+    //category create - post function 
+        resource function post categories(@http:Header string Authorization, CategoryRequest categoryData)
             returns json|http:BadRequest|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
         map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
@@ -232,7 +244,7 @@ service /api on new http:Listener(9094) {
                 return <http:BadRequest>{body: {"message": "Category with this name already exists"}};
             }
 
-            // FIXED: Create category with proper userId
+            // Create category with proper userId
             record {|
                 string name;
                 map<json> userId;
@@ -241,7 +253,7 @@ service /api on new http:Listener(9094) {
                 string updatedAt;
             |} newCategory = {
                 name: categoryData.name.trim(),
-                userId: userId, // This should now properly contain the ObjectId
+                userId: userId, 
                 links: [],
                 createdAt: time:utcToString(time:utcNow()),
                 updatedAt: time:utcToString(time:utcNow())
@@ -255,7 +267,7 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // FIXED: Get all categories for authenticated user
+    // ========= Get all categories for authenticated user ==========
     resource function get categories(@http:Header string Authorization)
             returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
@@ -272,7 +284,7 @@ service /api on new http:Listener(9094) {
         do {
             mongodb:Collection categoryCollection = check myDb->getCollection("categories");
 
-            // FIXED: Proper query with userId ObjectId
+            // Proper query with userId ObjectId
             stream<record {|anydata...;|}, error?> categoryStream =
                 check categoryCollection->find({userId: userId});
 
@@ -287,7 +299,7 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Update a category
+    // ========= Update a category ==========
     resource function put categories/[string categoryId](@http:Header string Authorization, CategoryUpdate updateData)
             returns json|http:BadRequest|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
@@ -338,7 +350,7 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Delete a category
+    // ========= Delete a category ==========
     resource function delete categories/[string categoryId](@http:Header string Authorization)
             returns json|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
@@ -385,9 +397,9 @@ service /api on new http:Listener(9094) {
 
     // =============== LINK CRUD OPERATIONS ===============
 
-    // FIXED: Create a new link - Complete working version with proper array handling
+    //  ========== Create a new link  ===========
     resource function post links(@http:Header string Authorization, LinkRequest linkData)
-        returns json|http:BadRequest|http:InternalServerError|http:Unauthorized|http:Forbidden {
+    returns json|http:BadRequest|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
         map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
         if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
@@ -416,35 +428,43 @@ service /api on new http:Listener(9094) {
                 cleanUrl = "https://" + cleanUrl;
             }
 
-            // Check if category exists and belongs to user
-            map<json> categoryObjectId = self.createObjectId(linkData.categoryId);
+            // Hash the URL for security
+            string hashedUrl = check self.hashUrl(cleanUrl);
 
-            stream<record {|anydata...;|}, error?> categoryStream =
-            check categoryCollection->find({_id: categoryObjectId, userId: userId});
+            // Handle optional category
+            map<json>? categoryObjectId = ();
+            if (linkData?.categoryId is string) {
+                string categoryId = <string>linkData?.categoryId;
+                categoryObjectId = self.createObjectId(categoryId);
 
-            record {|anydata...;|}[] categories = [];
-            check categoryStream.forEach(function(record {|anydata...;|} cat) {
-                categories.push(cat);
-            });
+                // Verify category exists and belongs to user
+                stream<record {|anydata...;|}, error?> categoryStream =
+                check categoryCollection->find({_id: categoryObjectId, userId: userId});
 
-            if (categories.length() == 0) {
-                return <http:BadRequest>{body: {"message": "Category not found"}};
+                record {|anydata...;|}[] categories = [];
+                check categoryStream.forEach(function(record {|anydata...;|} cat) {
+                    categories.push(cat);
+                });
+
+                if (categories.length() == 0) {
+                    return <http:BadRequest>{body: {"message": "Category not found"}};
+                }
             }
 
             string iconUrl = self.generateFaviconUrl(cleanUrl);
 
-            // Create link document
+            // Create link document with optional categoryId
             record {|
                 string name;
-                string url;
+                string hashedUrl;
                 string icon;
-                map<json> categoryId;
+                map<json>? categoryId;
                 map<json> userId;
                 string createdAt;
                 string updatedAt;
             |} newLink = {
                 name: linkData.name.trim(),
-                url: cleanUrl,
+                hashedUrl: hashedUrl,
                 icon: iconUrl,
                 categoryId: categoryObjectId,
                 userId: userId,
@@ -452,98 +472,76 @@ service /api on new http:Listener(9094) {
                 updatedAt: time:utcToString(time:utcNow())
             };
 
-            // Insert the link first
             error? insertError = linkCollection->insertOne(newLink);
             if insertError is error {
                 return <http:InternalServerError>{body: {"message": "Failed to insert link: " + insertError.toString()}};
             }
 
-            // FIXED: Get the inserted link ID using a more reliable approach
-            mongodb:FindOptions findOptions = {
-                sort: {"_id": -1},
-                'limit: 1
-            };
+            // Only update category if categoryId is provided
+            if (categoryObjectId is map<json>) {
+                // Get the inserted link ID and update category
+                mongodb:FindOptions findOptions = {
+                    sort: {"_id": -1},
+                    'limit: 1
+                };
 
-            stream<record {|json _id; anydata...;|}, error?> insertedLinkStream =
-            check linkCollection->find({
-                name: newLink.name,
-                url: newLink.url,
-                categoryId: categoryObjectId,
-                userId: userId
-            }, findOptions);
+                stream<record {|json _id; anydata...;|}, error?> insertedLinkStream =
+                check linkCollection->find({
+                    name: newLink.name,
+                    hashedUrl: newLink.hashedUrl,
+                    categoryId: categoryObjectId,
+                    userId: userId
+                }, findOptions);
 
-            record {|json _id; anydata...;|}[] insertedLinks = [];
-            check insertedLinkStream.forEach(function(record {|json _id; anydata...;|} link) {
-                insertedLinks.push(link);
-            });
-
-            if (insertedLinks.length() > 0) {
-                json linkId = insertedLinks[0]._id;
-
-                if (linkId is ()) {
-                    return <http:InternalServerError>{body: {"message": "Failed to get inserted link ID"}};
-                }
-
-                // FIXED: Get current category and properly handle the links array to preserve ALL existing links
-                stream<record {|anydata...;|}, error?> currentCategoryStream =
-                check categoryCollection->find({_id: categoryObjectId, userId: userId});
-
-                record {|anydata...;|}[] currentCategories = [];
-                check currentCategoryStream.forEach(function(record {|anydata...;|} cat) {
-                    currentCategories.push(cat);
+                record {|json _id; anydata...;|}[] insertedLinks = [];
+                check insertedLinkStream.forEach(function(record {|json _id; anydata...;|} link) {
+                    insertedLinks.push(link);
                 });
 
-                if (currentCategories.length() > 0) {
-                    anydata currentLinksData = currentCategories[0]["links"];
-                    json[] updatedLinks = [];
+                if (insertedLinks.length() > 0) {
+                    json linkId = insertedLinks[0]._id;
 
-                    // FIXED: Handle existing links with proper type checking and conversion
-                    if (currentLinksData is json[]) {
-                        // If it's already a json array, copy all existing links one by one
-                        foreach json existingLink in currentLinksData {
-                            updatedLinks.push(existingLink);
-                        }
-                    } else if (currentLinksData is anydata[]) {
-                        // Convert anydata array to json array carefully
-                        foreach anydata existingLink in currentLinksData {
-                            if (existingLink != ()) {
-                                // Use cloneReadOnly to safely convert to json
-                                json convertedLink = <json>existingLink.cloneReadOnly();
-                                updatedLinks.push(convertedLink);
+                    // Update category with new link ID (same logic as before)
+                    stream<record {|anydata...;|}, error?> currentCategoryStream =
+                    check categoryCollection->find({_id: categoryObjectId, userId: userId});
+
+                    record {|anydata...;|}[] currentCategories = [];
+                    check currentCategoryStream.forEach(function(record {|anydata...;|} cat) {
+                        currentCategories.push(cat);
+                    });
+
+                    if (currentCategories.length() > 0) {
+                        anydata currentLinksData = currentCategories[0]["links"];
+                        json[] updatedLinks = [];
+
+                        if (currentLinksData is json[]) {
+                            foreach json existingLink in currentLinksData {
+                                updatedLinks.push(existingLink);
+                            }
+                        } else if (currentLinksData is anydata[]) {
+                            foreach anydata existingLink in currentLinksData {
+                                if (existingLink != ()) {
+                                    json convertedLink = <json>existingLink.cloneReadOnly();
+                                    updatedLinks.push(convertedLink);
+                                }
                             }
                         }
-                    } else if (currentLinksData != ()) {
-                        // Handle case where links might be a single value
-                        json singleLink = <json>currentLinksData.cloneReadOnly();
-                        updatedLinks.push(singleLink);
+
+                        updatedLinks.push(linkId);
+
+                        mongodb:Update categoryUpdate = {
+                            set: {
+                                "links": updatedLinks,
+                                "updatedAt": time:utcToString(time:utcNow())
+                            }
+                        };
+
+                        mongodb:UpdateResult _ = check categoryCollection->updateOne(
+                        {_id: categoryObjectId, userId: userId},
+                        categoryUpdate
+                        );
                     }
-                    // If currentLinksData is (), updatedLinks remains empty array []
-
-                    // Add the new link ID to the existing array
-                    updatedLinks.push(linkId);
-
-                    // Update the category with ALL existing links plus the new one
-                    mongodb:Update categoryUpdate = {
-                        set: {
-                            "links": updatedLinks,
-                            "updatedAt": time:utcToString(time:utcNow())
-                        }
-                    };
-
-                    mongodb:UpdateResult updateResult = check categoryCollection->updateOne(
-                    {_id: categoryObjectId, userId: userId},
-                    categoryUpdate
-                    );
-
-                    // Verify the update was successful
-                    if (updateResult.modifiedCount == 0) {
-                        return <http:InternalServerError>{body: {"message": "Failed to update category with new link"}};
-                    }
-                } else {
-                    return <http:InternalServerError>{body: {"message": "Category not found during update"}};
                 }
-            } else {
-                return <http:InternalServerError>{body: {"message": "Failed to retrieve inserted link"}};
             }
 
             return {"message": "Link created successfully", "link": newLink};
@@ -552,9 +550,9 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Get links by category
-    resource function get links/category/[string categoryId](@http:Header string Authorization)
-            returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
+    // ======== Endpoint to get all links (categorized and uncategorized) =========
+    resource function get links/all(@http:Header string Authorization)
+        returns json|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
         map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
         if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
@@ -568,9 +566,61 @@ service /api on new http:Listener(9094) {
 
         do {
             mongodb:Collection linkCollection = check myDb->getCollection("links");
-            map<json> categoryObjectId = self.createObjectId(categoryId);
+
+            // Get all links for the user
             stream<record {|anydata...;|}, error?> linkStream =
-                check linkCollection->find({categoryId: categoryObjectId, userId: userId});
+            check linkCollection->find({userId: userId});
+
+            json[] categorizedLinks = [];
+            json[] uncategorizedLinks = [];
+
+            check linkStream.forEach(function(record {|anydata...;|} link) {
+                json linkJson = <json>link.cloneReadOnly();
+                anydata categoryIdData = link["categoryId"];
+
+                if (categoryIdData is () || categoryIdData == ()) {
+                    uncategorizedLinks.push(linkJson);
+                } else {
+                    categorizedLinks.push(linkJson);
+                }
+            });
+
+            return {
+                "categorizedLinks": categorizedLinks,
+                "uncategorizedLinks": uncategorizedLinks,
+                "totalLinks": categorizedLinks.length() + uncategorizedLinks.length()
+            };
+        } on fail var e {
+            return <http:InternalServerError>{body: {"message": "Failed to retrieve links: " + e.toString()}};
+        }
+    }
+
+    // Endpoint to get uncategorized links only
+    resource function get links/uncategorized(@http:Header string Authorization)
+        returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
+
+        map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
+        if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
+            return userIdResult;
+        }
+        if userIdResult is error {
+            return <http:InternalServerError>{body: {"message": "Authentication failed"}};
+        }
+
+        map<json> userId = <map<json>>userIdResult;
+
+        do {
+            mongodb:Collection linkCollection = check myDb->getCollection("links");
+
+            // Get links where categoryId is null or doesn't exist
+            stream<record {|anydata...;|}, error?> linkStream =
+            check linkCollection->find({
+                userId: userId,
+                "$or": [
+                    {"categoryId": ()},
+                    {"categoryId": {"$exists": false}}
+                ]
+            });
 
             json[] links = [];
             check linkStream.forEach(function(record {|anydata...;|} link) {
@@ -579,12 +629,64 @@ service /api on new http:Listener(9094) {
 
             return links;
         } on fail var e {
+            return <http:InternalServerError>{body: {"message": "Failed to retrieve uncategorized links: " + e.toString()}};
+        }
+    }
+
+    // ======= Get links by category to handle null categoryId =======
+    resource function get links/category/[string categoryId](@http:Header string Authorization)
+        returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
+
+        map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
+        if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
+            return userIdResult;
+        }
+        if userIdResult is error {
+            return <http:InternalServerError>{body: {"message": "Authentication failed"}};
+        }
+
+        map<json> userId = <map<json>>userIdResult;
+
+        do {
+            mongodb:Collection linkCollection = check myDb->getCollection("links");
+
+            if (categoryId == "uncategorized") {
+                // Handle special case for uncategorized links
+                stream<record {|anydata...;|}, error?> linkStream =
+                check linkCollection->find({
+                    userId: userId,
+                    "$or": [
+                        {"categoryId": ()},
+                        {"categoryId": {"$exists": false}}
+                    ]
+                });
+
+                json[] links = [];
+                check linkStream.forEach(function(record {|anydata...;|} link) {
+                    links.push(<json>link.cloneReadOnly());
+                });
+
+                return links;
+            } else {
+                // Normal category lookup
+                map<json> categoryObjectId = self.createObjectId(categoryId);
+                stream<record {|anydata...;|}, error?> linkStream =
+                check linkCollection->find({categoryId: categoryObjectId, userId: userId});
+
+                json[] links = [];
+                check linkStream.forEach(function(record {|anydata...;|} link) {
+                    links.push(<json>link.cloneReadOnly());
+                });
+
+                return links;
+            }
+        } on fail var e {
             return <http:InternalServerError>{body: {"message": "Failed to retrieve links: " + e.toString()}};
         }
     }
 
-    // utility function 
-    private function areObjectIdsEqual(json id1, json id2) returns boolean {
+    // AreObjectIdsEqual function 
+    isolated function areObjectIdsEqual(json id1, json id2) returns boolean {
         if (id1 is map<json> && id2 is map<json>) {
             json? oid1 = id1["$oid"];
             json? oid2 = id2["$oid"];
@@ -593,9 +695,11 @@ service /api on new http:Listener(9094) {
         return false;
     }
 
-    // Update link function
+
+    // ======= Update link function =======
+    
     resource function put links/[string linkId](@http:Header string Authorization, LinkUpdate updateData)
-        returns json|http:BadRequest|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
+    returns json|http:BadRequest|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
         map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
         if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
@@ -613,6 +717,7 @@ service /api on new http:Listener(9094) {
 
             map<json> linkObjectId = self.createObjectId(linkId);
 
+            // Get the existing link
             stream<record {|anydata...;|}, error?> existingStream =
             check linkCollection->find({_id: linkObjectId, userId: userId});
 
@@ -627,7 +732,7 @@ service /api on new http:Listener(9094) {
 
             record {|anydata...;|} currentLink = existing[0];
 
-            // FIXED: Safe type conversion
+            // Safe type conversion for current categoryId
             anydata currentCategoryData = currentLink["categoryId"];
             json? currentCategoryId = ();
             if (currentCategoryData is json) {
@@ -640,6 +745,7 @@ service /api on new http:Listener(9094) {
                 updatedAt: time:utcToString(time:utcNow())
             };
 
+            // Handle name update
             if (updateData?.name is string) {
                 string name = <string>updateData?.name;
                 if (name.trim().length() == 0) {
@@ -648,6 +754,7 @@ service /api on new http:Listener(9094) {
                 updateFields["name"] = name.trim();
             }
 
+            // Handle URL update with hashing
             if (updateData?.url is string) {
                 string inputUrl = <string>updateData?.url;
                 if (inputUrl.trim().length() == 0) {
@@ -659,109 +766,195 @@ service /api on new http:Listener(9094) {
                     cleanUrl = "https://" + cleanUrl;
                 }
 
-                updateFields["url"] = cleanUrl;
+                // Hash the new URL for security
+                string hashedUrl = check self.hashUrl(cleanUrl);
+                updateFields["hashedUrl"] = hashedUrl;
                 updateFields["icon"] = self.generateFaviconUrl(cleanUrl);
             }
 
+            // Handle categoryId updates including null values for uncategorized links
             if (updateData?.categoryId is string) {
                 string categoryId = <string>updateData?.categoryId;
-                map<json> newCategoryObjectId = self.createObjectId(categoryId);
 
-                stream<record {|anydata...;|}, error?> categoryStream =
-                check categoryCollection->find({_id: newCategoryObjectId, userId: userId});
+                if (categoryId == "uncategorized" || categoryId == "" || categoryId == "null") {
+                    // Move to uncategorized (set categoryId to null)
+                    updateFields["categoryId"] = ();
 
-                record {|anydata...;|}[] categories = [];
-                check categoryStream.forEach(function(record {|anydata...;|} cat) {
-                    categories.push(cat);
-                });
+                    // Remove from old category if it was categorized
+                    if (currentCategoryId is json && currentCategoryId != ()) {
+                        stream<record {|anydata...;|}, error?> oldCategoryStream =
+                        check categoryCollection->find({_id: currentCategoryId, userId: userId});
 
-                if (categories.length() == 0) {
-                    return <http:BadRequest>{body: {"message": "Category not found"}};
-                }
+                        record {|anydata...;|}[] oldCategories = [];
+                        check oldCategoryStream.forEach(function(record {|anydata...;|} cat) {
+                            oldCategories.push(cat);
+                        });
 
-                if (currentCategoryId is json && !self.areObjectIdsEqual(currentCategoryId, newCategoryObjectId)) {
-                    // Remove from old category
-                    stream<record {|anydata...;|}, error?> oldCategoryStream =
-                    check categoryCollection->find({_id: currentCategoryId, userId: userId});
+                        if (oldCategories.length() > 0) {
+                            anydata oldLinksData = oldCategories[0]["links"];
+                            json[] updatedOldLinks = [];
 
-                    record {|anydata...;|}[] oldCategories = [];
-                    check oldCategoryStream.forEach(function(record {|anydata...;|} cat) {
-                        oldCategories.push(cat);
-                    });
-
-                    if (oldCategories.length() > 0) {
-                        anydata oldLinksData = oldCategories[0]["links"];
-                        json[] updatedOldLinks = [];
-
-                        if (oldLinksData is json[]) {
-                            foreach json existingLink in oldLinksData {
-                                if (!self.areObjectIdsEqual(existingLink, linkObjectId)) {
-                                    updatedOldLinks.push(existingLink);
+                            // Remove this link from the old category's links array
+                            if (oldLinksData is json[]) {
+                                foreach json existingLink in oldLinksData {
+                                    if (!self.areObjectIdsEqual(existingLink, linkObjectId)) {
+                                        updatedOldLinks.push(existingLink);
+                                    }
                                 }
-                            }
-                        } else if (oldLinksData is anydata[]) {
-                            foreach anydata existingLink in oldLinksData {
-                                if (existingLink != ()) {
-                                    json convertedLink = <json>existingLink.cloneReadOnly();
-                                    if (!self.areObjectIdsEqual(convertedLink, linkObjectId)) {
-                                        updatedOldLinks.push(convertedLink);
+                            } else if (oldLinksData is anydata[]) {
+                                foreach anydata existingLink in oldLinksData {
+                                    if (existingLink != ()) {
+                                        json convertedLink = <json>existingLink.cloneReadOnly();
+                                        if (!self.areObjectIdsEqual(convertedLink, linkObjectId)) {
+                                            updatedOldLinks.push(convertedLink);
+                                        }
                                     }
                                 }
                             }
+
+                            // Update the old category
+                            mongodb:Update oldCategoryUpdate = {
+                                set: {
+                                    "links": updatedOldLinks,
+                                    "updatedAt": time:utcToString(time:utcNow())
+                                }
+                            };
+                            mongodb:UpdateResult _ = check categoryCollection->updateOne(
+                            {_id: currentCategoryId, userId: userId},
+                            oldCategoryUpdate
+                            );
                         }
-
-                        mongodb:Update oldCategoryUpdate = {
-                            set: {
-                                "links": updatedOldLinks,
-                                "updatedAt": time:utcToString(time:utcNow())
-                            }
-                        };
-                        mongodb:UpdateResult _ = check categoryCollection->updateOne({_id: currentCategoryId, userId: userId}, oldCategoryUpdate);
                     }
+                } else {
+                    // Normal category update - moving to a specific category
+                    map<json> newCategoryObjectId = self.createObjectId(categoryId);
 
-                    // Add to new category
-                    stream<record {|anydata...;|}, error?> newCategoryStream =
+                    // Verify the new category exists and belongs to user
+                    stream<record {|anydata...;|}, error?> categoryStream =
                     check categoryCollection->find({_id: newCategoryObjectId, userId: userId});
 
-                    record {|anydata...;|}[] newCategories = [];
-                    check newCategoryStream.forEach(function(record {|anydata...;|} cat) {
-                        newCategories.push(cat);
+                    record {|anydata...;|}[] categories = [];
+                    check categoryStream.forEach(function(record {|anydata...;|} cat) {
+                        categories.push(cat);
                     });
 
-                    if (newCategories.length() > 0) {
-                        anydata newLinksData = newCategories[0]["links"];
-                        json[] updatedNewLinks = [];
+                    if (categories.length() == 0) {
+                        return <http:BadRequest>{body: {"message": "Category not found"}};
+                    }
 
-                        if (newLinksData is json[]) {
-                            foreach json existingLink in newLinksData {
-                                updatedNewLinks.push(existingLink);
-                            }
-                        } else if (newLinksData is anydata[]) {
-                            foreach anydata existingLink in newLinksData {
-                                if (existingLink != ()) {
-                                    json convertedLink = <json>existingLink.cloneReadOnly();
-                                    updatedNewLinks.push(convertedLink);
+                    // Check if we're actually changing categories
+                    boolean categoryChanged = false;
+
+                    if (currentCategoryId is () || currentCategoryId == ()) {
+                        // Moving from uncategorized to categorized
+                        categoryChanged = true;
+                    } else if (currentCategoryId is json && !self.areObjectIdsEqual(currentCategoryId, newCategoryObjectId)) {
+                        // Moving from one category to another
+                        categoryChanged = true;
+                    }
+
+                    if (categoryChanged) {
+                        // Remove from old category (if it was categorized)
+                        if (currentCategoryId is json && currentCategoryId != ()) {
+                            stream<record {|anydata...;|}, error?> oldCategoryStream =
+                            check categoryCollection->find({_id: currentCategoryId, userId: userId});
+
+                            record {|anydata...;|}[] oldCategories = [];
+                            check oldCategoryStream.forEach(function(record {|anydata...;|} cat) {
+                                oldCategories.push(cat);
+                            });
+
+                            if (oldCategories.length() > 0) {
+                                anydata oldLinksData = oldCategories[0]["links"];
+                                json[] updatedOldLinks = [];
+
+                                if (oldLinksData is json[]) {
+                                    foreach json existingLink in oldLinksData {
+                                        if (!self.areObjectIdsEqual(existingLink, linkObjectId)) {
+                                            updatedOldLinks.push(existingLink);
+                                        }
+                                    }
+                                } else if (oldLinksData is anydata[]) {
+                                    foreach anydata existingLink in oldLinksData {
+                                        if (existingLink != ()) {
+                                            json convertedLink = <json>existingLink.cloneReadOnly();
+                                            if (!self.areObjectIdsEqual(convertedLink, linkObjectId)) {
+                                                updatedOldLinks.push(convertedLink);
+                                            }
+                                        }
+                                    }
                                 }
+
+                                mongodb:Update oldCategoryUpdate = {
+                                    set: {
+                                        "links": updatedOldLinks,
+                                        "updatedAt": time:utcToString(time:utcNow())
+                                    }
+                                };
+                                mongodb:UpdateResult _ = check categoryCollection->updateOne(
+                                {_id: currentCategoryId, userId: userId},
+                                oldCategoryUpdate
+                                );
                             }
                         }
 
-                        updatedNewLinks.push(linkObjectId);
+                        // Add to new category
+                        stream<record {|anydata...;|}, error?> newCategoryStream =
+                        check categoryCollection->find({_id: newCategoryObjectId, userId: userId});
 
-                        mongodb:Update newCategoryUpdate = {
-                            set: {
-                                "links": updatedNewLinks,
-                                "updatedAt": time:utcToString(time:utcNow())
+                        record {|anydata...;|}[] newCategories = [];
+                        check newCategoryStream.forEach(function(record {|anydata...;|} cat) {
+                            newCategories.push(cat);
+                        });
+
+                        if (newCategories.length() > 0) {
+                            anydata newLinksData = newCategories[0]["links"];
+                            json[] updatedNewLinks = [];
+
+                            // Get existing links in the new category
+                            if (newLinksData is json[]) {
+                                foreach json existingLink in newLinksData {
+                                    updatedNewLinks.push(existingLink);
+                                }
+                            } else if (newLinksData is anydata[]) {
+                                foreach anydata existingLink in newLinksData {
+                                    if (existingLink != ()) {
+                                        json convertedLink = <json>existingLink.cloneReadOnly();
+                                        updatedNewLinks.push(convertedLink);
+                                    }
+                                }
                             }
-                        };
-                        mongodb:UpdateResult _ = check categoryCollection->updateOne({_id: newCategoryObjectId, userId: userId}, newCategoryUpdate);
-                    }
-                }
 
-                updateFields["categoryId"] = newCategoryObjectId;
+                            // Add this link to the new category
+                            updatedNewLinks.push(linkObjectId);
+
+                            mongodb:Update newCategoryUpdate = {
+                                set: {
+                                    "links": updatedNewLinks,
+                                    "updatedAt": time:utcToString(time:utcNow())
+                                }
+                            };
+                            mongodb:UpdateResult _ = check categoryCollection->updateOne(
+                            {_id: newCategoryObjectId, userId: userId},
+                            newCategoryUpdate
+                            );
+                        }
+                    }
+
+                    updateFields["categoryId"] = newCategoryObjectId;
+                }
             }
 
+            // Apply the updates to the link
             mongodb:Update updateOperation = {set: updateFields};
-            mongodb:UpdateResult _ = check linkCollection->updateOne({_id: linkObjectId, userId: userId}, updateOperation);
+            mongodb:UpdateResult updateResult = check linkCollection->updateOne(
+            {_id: linkObjectId, userId: userId},
+            updateOperation
+            );
+
+            if (updateResult.modifiedCount == 0) {
+                return <http:InternalServerError>{body: {"message": "Failed to update link"}};
+            }
 
             return {"message": "Link updated successfully"};
         } on fail var e {
@@ -769,7 +962,7 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Delete link function
+    // ======= Delete link function ========
     resource function delete links/[string linkId](@http:Header string Authorization)
         returns json|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
@@ -801,7 +994,7 @@ service /api on new http:Listener(9094) {
                 return <http:NotFound>{body: {"message": "Link not found"}};
             }
 
-            // FIXED: Safe type conversion
+            // Safe type conversion
             record {|anydata...;|} linkToDelete = existing[0];
             anydata categoryData = linkToDelete["categoryId"];
             json? categoryId = ();
@@ -952,7 +1145,7 @@ service /api on new http:Listener(9094) {
         }
     }
 
-    // Export all user data
+    // ======= Export all user data ========
     resource function get export(@http:Header string Authorization)
             returns json|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
