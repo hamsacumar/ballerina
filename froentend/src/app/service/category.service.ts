@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { Category } from '../model/category.model';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CategoryService {
-  private apiUrl = `${environment.apiBaseUrl}/categories`;
+private apiUrl = 'http://localhost:9094/api/categories';
 
   constructor(private http: HttpClient) {}
 
@@ -16,12 +14,12 @@ export class CategoryService {
     return this.http.get<Category[]>(this.apiUrl);
   }
 
-  create(payload: { name: string }): Observable<any> {
-    return this.http.post(this.apiUrl, payload);
+  create(data: { name: string }): Observable<any> {
+    return this.http.post(this.apiUrl, data);
   }
 
-  update(id: string, payload: { name: string }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, payload);
+  update(id: string, data: { name: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
   }
 
   remove(id: string): Observable<any> {

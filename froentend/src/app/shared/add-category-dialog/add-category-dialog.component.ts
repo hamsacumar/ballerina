@@ -21,7 +21,7 @@ export interface CategoryDialogData {
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './add-category-dialog.component.html',
   styleUrls: ['./add-category-dialog.component.css']

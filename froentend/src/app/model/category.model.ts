@@ -1,8 +1,8 @@
 export interface Category {
-  _id?: string;
+  _id?: string;      // MongoDB ObjectId
   name: string;
-  userId?: any;
-  links?: any[];
+  userId?: any;      // stored as object in backend
+  links?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
