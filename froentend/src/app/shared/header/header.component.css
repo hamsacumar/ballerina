@@ -166,3 +166,12 @@
 .dropdown-menu.open .dropdown-item:nth-child(2) {
   animation-delay: 0.2s;
 }
+/* Logo image */
+.navbar-logo {
+  height: 36px;      /* Adjust to fit navbar height */
+  width: 36px;       /* Keep it square */
+  object-fit: contain;
+  margin-right: 10px; /* Space between logo and app name */
+  border-radius: 4px; /* Optional: rounded corners */
+  vertical-align: middle;
+}

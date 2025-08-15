@@ -23,11 +23,18 @@
     <div class="see-more" *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)">
       <button mat-button (click)="seeMore('all')">See more</button>
     </div>
-    <div class="add-link-inline">
-      <button mat-stroked-button (click)="openAddLinkDialog()">
-        <mat-icon>add</mat-icon> Add Link
-      </button>
+    <!-- Add Link Button - Placed under "All" heading -->
+<div class="add-link-container">
+  <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
+    <div class="button-content">
+      <div class="circle-icon">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="button-text">Add Link</span>
     </div>
+  </button>
+</div>
+  
   </section>
 
   <!-- CATEGORIES -->
@@ -70,11 +77,15 @@
     </div>
   </section>
 
-  <!-- Floating Add Category -->
-  <div class="add-category-container floating-position">
-    <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
-      <mat-icon>add</mat-icon> Add Category
-    </button>
-  </div>
+  <!-- Add Category Button - Bottom right floating position -->
+<div class="add-category-container floating-position">
+  <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
+    <div class="button-content">
+      <div class="circle-icon">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="button-text">Add Category</span>
+    </div>
+  </button>
 </div>
 <app-footer></app-footer>
