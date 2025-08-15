@@ -1,16 +1,27 @@
-<h2>Enter Verification Code for forgot password</h2>
-  <p>We sent a 6-digit code to your Gmail.</p>
+<div class="verification-container">
+  <div class="verification-card">
+    <h2>Enter Verification Code for forgot password</h2>
+    <p>We sent a 6-digit code to your Gmail.</p>
 
-  <form action="reset-password.html" method="get">
-    <div class="code-container">
-      <input type="text" maxlength="1" class="code-input" required>
-      <input type="text" maxlength="1" class="code-input" required>
-      <input type="text" maxlength="1" class="code-input" required>
-      <input type="text" maxlength="1" class="code-input" required>
-      <input type="text" maxlength="1" class="code-input" required>
-      <input type="text" maxlength="1" class="code-input" required>
-    </div>
-    <br>
-  <button (click)="navigateTo('login')" class="secondary-button">Send Code</button>
+    <form action="reset-password.html" method="get">
+      <div class="code-container">
+        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" required>
+      </div>
+      
+      <button (click)="navigateTo('login')" class="secondary-button full-width">Verify Code</button>
+    </form>
 
-  </form>
+    <p class="resend-code">
+      Didn't receive the code? <span>Resend Code</span>
+    </p>
+    
+    <p class="back-to-login">
+      <span (click)="navigateTo('login')">Back to Login</span>
+    </p>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoginPanelComponent } from '../panel/login-panel/login-panel.component';
 import { RegisterPanelComponent } from '../panel/register-panel/register-panel.component';
@@ -18,8 +18,10 @@ import { ForgotCodeComponent } from "../panel/forgot-code/forgot-code.component"
     ForgotCodeComponent
 ],
   templateUrl: './landingpage.component.html',
-  styleUrls: ['./landingpage.component.css']
+  styleUrls: ['./landingpage.component.css'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA ]
 })
+
 export class LandingpageComponent {
   activeView: string = 'login';
 

@@ -1,0 +1,191 @@
+/* Center the card */
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Semi-transparent, rounded login card */
+.login-card {
+  background: rgba(255, 255, 255, 0.086);
+  padding: 40px 30px;
+  border-radius: 16px;
+  border: #6e9b1b 1px solid;
+  width: 350px;
+  color: white; /* Default white text inside card */
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Heading - white */
+.login-card h2 {
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: white;
+}
+
+/* Form styling */
+.login-form {
+  width: 100%;
+}
+
+/* Form group container */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* Label styling */
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Input field styling */
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #6e9b1b;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+  color: rgba(110, 155, 27, 0.7);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #6e9b1b;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(110, 155, 27, 0.2);
+}
+
+.form-group input:hover {
+  border-color: rgba(110, 155, 27, 0.5);
+}
+
+/* Options section */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.options label {
+  color: white; /* "any problem with us" in white */
+}
+
+.options .forgot {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #6e9b1b;
+  font-weight: 500;
+}
+
+/* Green button */
+.login-button {
+  width: 100%;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 12px 0;
+  background-color: #6e9b1b !important;
+  color: white !important;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.login-button:hover {
+  background-color: #5a8215 !important;
+}
+
+/* Register text in white, link green */
+.register {
+  color: white; /* "Don't have an account?" in white */
+}
+
+.register span {
+  color: #6e9b1b;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-card {
+    width: 90%;
+    max-width: 350px;
+    padding: 30px 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 20px;
+  }
+  
+  .login-card {
+    width: 100%;
+    padding: 25px 20px;
+  }
+  
+  .login-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 18px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+  
+  .options {
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+  }
+  
+  .login-button {
+    padding: 10px 0;
+    font-size: 0.95rem;
+  }
+  
+  .register {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-card {
+    padding: 20px 15px;
+  }
+  
+  .options {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
