@@ -1,0 +1,35 @@
+<div class="upload-container">
+  <div class="upload-card">
+    <h2>Change profile photo</h2>
+
+    <!-- Drag & Drop Area -->
+    <div 
+      class="drop-zone"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      [class.drag-over]="isDragOver"
+    >
+      <!-- If a preview is available, show it -->
+      <ng-container *ngIf="previewUrl; else uploadIcon">
+        <img [src]="previewUrl" alt="Profile Preview" class="preview-img">
+      </ng-container>
+
+      <!-- Otherwise show the upload icon -->
+      <ng-template #uploadIcon>
+        <p>Drag and drop your images here</p>
+        <span>or</span>
+        <label class="file-label">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)">
+          Upload a photo
+        </label>
+      </ng-template>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="upload-button" (click)="onUpload()" [disabled]="!selectedFile">Upload</button>
+      <button class="cancel-button" (click)="navigateTo('login')">Skip</button>
+    </div>
+  </div>
+</div>
