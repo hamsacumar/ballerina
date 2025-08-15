@@ -12,5 +12,6 @@
     <app-verify-panel *ngIf="activeView === 'verify'" (viewChange)="setView($event)"></app-verify-panel>
     <app-forgotpassword-panel *ngIf="activeView === 'forgotpassword'" (viewChange)="setView($event)"></app-forgotpassword-panel>
     <app-forgot-code *ngIf="activeView === 'forgotpasswordcode'" (viewChange)="setView($event)"></app-forgot-code>
+    <app-upload-profile-panel *ngIf="activeView === 'profilecode'" (viewChange)="setView($event)"></app-upload-profile-panel>
   </div>
 </div>
