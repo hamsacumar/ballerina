@@ -1,18 +1,30 @@
 <div class="login-container">
-  <h2>Login</h2>
-  <form class="login-form">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-    <button type="submit" class="login-button">Login</button>
-  </form>
-  <div class="button-group">
-    <button (click)="navigateTo('register')" class="secondary-button">Register</button>
-    <button (click)="navigateTo('forgotpassword')" class="secondary-button">Forgot Password</button>
+  <div class="login-card">
+    <h2>Login</h2>
+
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="username" placeholder="Enter your email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" formControlName="password" placeholder="Enter your password" required>
+      </div>
+
+      <div class="options">
+        <label>
+          any problem with us 
+        </label>
+        <span class="forgot" (click)="navigateTo('forgotpassword')">Forgot password?</span>
+      </div>
+
+      <button type="submit" class="login-button">Log In</button>
+    </form>
+
+    <p class="register">
+      Don't have an account? <span (click)="navigateTo('register')">Register</span>
+    </p>
   </div>
 </div>
