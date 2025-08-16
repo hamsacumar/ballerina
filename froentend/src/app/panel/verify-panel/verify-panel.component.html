@@ -1,19 +1,19 @@
 <div class="verification-container">
   <div class="verification-card">
     <h2>Enter Verification Code</h2>
-    <p>Please enter the 6-digit verification code.</p>
+    <p>Please enter the 6-digit verification code sent to {{ email }}</p>
     
-    <form>
+    <form (submit)="onVerify(); $event.preventDefault()">
       <div class="code-container">
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[0]" name="c1" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[1]" name="c2" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[2]" name="c3" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[3]" name="c4" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[4]" name="c5" required>
+        <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[5]" name="c6" required>
       </div>
       
-      <button (click)="navigateTo('profilecode')" class="secondary-button">Verify</button>
+      <button type="submit" class="secondary-button">Verify</button>
     </form>
   </div>
 </div>
