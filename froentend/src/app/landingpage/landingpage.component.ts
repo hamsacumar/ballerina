@@ -29,23 +29,33 @@ import { ChangepasswordPanelComponent } from '../panel/changepassword-panel/chan
 
 export class LandingpageComponent {
   activeView: string = 'login';
-
-  setView(view: string) {
-    console.log('setView called with:', view);
-    // If the view is 'home', navigate to the home route
-    if (view === 'home') {
-      console.log('Navigating to /home');
-      this.router.navigate(['/home']).then(success => {
-        console.log('Navigation successful:', success);
-      }).catch(err => {
-        console.error('Navigation error:', err);
-      });
-      return;
-    }
-    // Otherwise, update the active view
-    console.log('Updating activeView to:', view);
-    this.activeView = view;
-  }
-
   private router = inject(Router);
+
+  setView(view: string | { view: string, data?: any }) {
+    let viewName: string;
+    let viewData: any;
+
+    if (typeof view === 'string') {
+      viewName = view;
+    } else {
+      viewName = view.view;
+      viewData = view.data;
+      // Handle any additional data if needed
+      if (viewData) {
+        console.log('Received data:', viewData);
+        // Store the data in a service or component property if needed
+      }
+    }
+
+    console.log('setView called with:', viewName);
+    
+    if (viewName === 'home') {
+      console.log('Navigating to /home');
+      this.router.navigate(['/home']).then((success: boolean) => {
+        console.log('Navigation successful:', success);
+      });
+    } else {
+      this.activeView = viewName;
+    }
+  }
 }

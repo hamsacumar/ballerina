@@ -26,6 +26,8 @@ import { AuthService } from '../../service/auth.service';
 export class ChangepasswordPanelComponent implements OnInit {
   @Output() viewChange = new EventEmitter<string>();
   changePasswordForm!: FormGroup;
+  hidePassword = true;
+  hideConfirmPassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -34,13 +36,20 @@ export class ChangepasswordPanelComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  verificationCode: string = '';
+
   ngOnInit(): void {
+    const savedEmail = localStorage.getItem('resetEmail') || '';
+    const savedCode = localStorage.getItem('resetCode') || '';
+  
     this.changePasswordForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: [savedEmail, [Validators.required, Validators.email]],
+      verificationCode: [savedCode, [Validators.required, Validators.minLength(6)]],
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordsMatchValidator });
   }
+  
 
   // Validator to ensure newPassword and confirmPassword match
   private passwordsMatchValidator(form: FormGroup) {
@@ -50,25 +59,44 @@ export class ChangepasswordPanelComponent implements OnInit {
   }
 
   onChangePassword(): void {
+    this.changePasswordForm.markAllAsTouched();
+  
     if (this.changePasswordForm.invalid) {
       this.snackBar.open('Please fill in all fields correctly', 'Close', { duration: 5000 });
       return;
     }
-
-    const { email, newPassword } = this.changePasswordForm.value;
-
-    this.auth.resetPassword({ email, newPassword }).subscribe({
+  
+    const { email, verificationCode, newPassword } = this.changePasswordForm.value;
+  
+    const snackBarRef = this.snackBar.open('Resetting password...', undefined, { duration: 0 });
+  
+    this.auth.resetPassword({ 
+      email, 
+      resetCode: verificationCode,
+      newPassword 
+    }).subscribe({
       next: () => {
-        this.snackBar.open('Password changed successfully!', 'Close', { duration: 3000 });
-        this.viewChange.emit('login'); // Navigate back to login
+        snackBarRef.dismiss();
+        this.snackBar.open('Password changed successfully!', 'Close', { duration: 3000, panelClass: 'success-snackbar' });
+  
+        // ✅ clean localStorage
+        localStorage.removeItem('resetEmail');
+        localStorage.removeItem('resetCode');
+  
+        this.viewChange.emit('login');
       },
       error: (err) => {
+        snackBarRef.dismiss();
         const errorMessage = err?.error?.message || 'Password change failed. Please try again.';
-        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+        this.snackBar.open(errorMessage, 'Close', { 
+          duration: 5000,
+          panelClass: 'error-snackbar'
+        });
         console.error('Password change error:', err);
       }
     });
   }
+  
 
   navigateTo(view: string): void {
     this.viewChange.emit(view);

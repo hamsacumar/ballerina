@@ -25,15 +25,21 @@ export class ForgotpasswordPanelComponent {
 
   sendCode(): void {
     if (!this.email) return;
-
+  
+    // Save email to local storage for later (reset step)
+    localStorage.setItem('resetEmail', this.email);
+  
     this.authService.forgotPassword({ email: this.email }).subscribe({
       next: (res) => {
-        console.log('Verification code sent', res);
-        this.navigateTo('forgotpasswordcode'); // Go to the code verification panel
+        console.log('✅ Verification code sent', res);
+        this.navigateTo('forgotpasswordcode'); 
       },
       error: (err) => {
-        console.error('Error sending code', err);
+        console.error('❌ Error sending code', err);
+  
+        // Optional: still navigate so attacker can't guess which emails exist
+        this.navigateTo('forgotpasswordcode');
       }
     });
-  }
+  }  
 }
