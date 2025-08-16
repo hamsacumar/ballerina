@@ -443,14 +443,16 @@ Your App Team
         time:Utc expiryTime = time:utcAddSeconds(currentTime, 900); // 15 minutes
 
         // Update user with reset code and expiry
+        mongodb:Update update = {
+            set: {
+                resetCode: resetCode,
+                resetExpiry: time:utcToString(expiryTime)
+            }
+        };
+        
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: forgotData.email},
-            {
-                "$set": {
-                    "resetCode": resetCode,
-                    "resetExpiry": time:utcToString(expiryTime)
-                }
-            }
+            update
         );
 
         if updateResult.modifiedCount == 0 {
@@ -515,17 +517,19 @@ Your App Team
         string hashedNewPassword = check self.hashPassword(resetData.newPassword);
 
         // Update user password and remove reset code
+        mongodb:Update update = {
+            set: {
+                password: hashedNewPassword
+            },
+            unset: {
+                resetCode: true,
+                resetExpiry: true
+            }
+        };
+        
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: resetData.email},
-            {
-                "$set": {
-                    "password": hashedNewPassword
-                },
-                "$unset": {
-                    "resetCode": "",
-                    "resetExpiry": ""
-                }
-            }
+            update
         );
 
         if updateResult.modifiedCount == 0 {

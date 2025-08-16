@@ -1,25 +1,31 @@
 <div class="verification-container">
   <div class="verification-card">
-    <h2>Enter Verification Code for forgot password</h2>
+    <h2>Enter Verification Code</h2>
     <p>We sent a 6-digit code to your Gmail.</p>
 
-    <form action="reset-password.html" method="get">
-      <div class="code-container">
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-        <input type="text" maxlength="1" class="code-input" required>
-      </div>
-      
-      <button (click)="navigateTo('changepassword')" class="secondary-button full-width">Verify Code</button>
-    </form>
-
-    <p class="resend-code">
-      Didn't receive the code? <span>Resend Code</span>
-    </p>
+    <form (ngSubmit)="onVerify()" class="code-container">
+      <input
+        #codeInput
+        *ngFor="let box of codeInputs; let i = index"
+        type="text"
+        maxlength="1"
+        class="code-input"
+        [(ngModel)]="codeInputs[i]"
+        name="code{{ i }}"
+        required
+        (input)="moveToNext($event, i)"
+        (keydown)="moveToPrev($event, i)"
+      >
     
+      <button type="submit" class="secondary-button full-width">
+        Verify Code
+      </button>
+    </form>
+    
+    
+    
+    <p *ngIf="error" class="error">{{ error }}</p>
+
     <p class="back-to-login">
       <span (click)="navigateTo('login')">Back to Login</span>
     </p>
