@@ -10,22 +10,23 @@ import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../app/guard/auth.guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     component: LandingpageComponent,
     children: [
       { path: 'login', redirectTo: '', pathMatch: 'full' },
-      { path: 'register', redirectTo: '', pathMatch: 'full' }
-    ]
+      { path: 'register', redirectTo: '', pathMatch: 'full' },
+    ],
   },
-  { 
-    path: 'home', 
-    component: HomeComponent, 
-    canActivate: [AuthGuard] 
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [AuthGuard],
   },
   { path: 'test', component: TestComponent },
   { path: 'header', component: HeaderComponent },
   { path: 'footer', component: FooterComponent },
   { path: 'add-link', component: AddLinkDialogComponent },
-  { path: '**', redirectTo: '' } // Catch-all route
+  { path: 'profile', component: ProfileComponent },
+  { path: '**', redirectTo: '' }, // Catch-all route
 ];

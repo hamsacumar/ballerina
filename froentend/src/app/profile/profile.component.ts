@@ -14,6 +14,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ProfileService } from '../service/profile.service';
 import { ChangePasswordRequest,User } from '../model/profile.model';
+import { Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-profile',
@@ -70,15 +71,9 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //  if (typeof localStorage !== 'undefined') {
-    //    this.loadUserProfile();
-    //  }
-    this.user = {
-      username: 'testuser',
-      email: 'test@example.com',
-      role: 'user',
-      createdAt: new Date().toISOString(),
-    };
+     if (typeof localStorage !== 'undefined') {
+       this.loadUserProfile();
+     }
   }
 
   loadUserProfile(): void {
@@ -285,10 +280,12 @@ export class ProfileComponent implements OnInit {
     this.imageSuccess = '';
   }
 
+  @Output() closeModal = new EventEmitter<void>();
+
   logout(): void {
     // Add your logout logic here
     console.log('Logging out...');
-    // Example: this.authService.logout();
+    this.closeModal.emit();
     // Example: this.router.navigate(['/login']);
   }
 }
