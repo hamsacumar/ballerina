@@ -1,0 +1,285 @@
+<div class="profile-container">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <h2>My Profile</h2>
+  </div>
+
+  <!-- Profile Image Section -->
+  <div class="profile-image-section">
+    <div class="image-container">
+      <div class="profile-image-placeholder">
+        <i class="camera-icon">📷</i>
+        <span>Profile Picture</span>
+      </div>
+      <div class="image-overlay" (click)="triggerFileInput()">
+        <i class="edit-icon">📷</i>
+        <span>Edit</span>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        (change)="onFileSelected($event)"
+        style="display: none"
+      />
+    </div>
+
+    <!-- Image Upload Messages -->
+    <div *ngIf="isUploadingImage" class="loading-message">
+      Uploading image...
+    </div>
+    <div *ngIf="imageSuccess" class="success-message">
+      {{ imageSuccess }}
+    </div>
+    <div *ngIf="imageError" class="error-message">
+      {{ imageError }}
+    </div>
+  </div>
+
+  <!-- User Information Section -->
+  <div class="user-info-section">
+    <!-- Username Section -->
+    <div class="info-item">
+      <label class="info-label">Username</label>
+      <div class="info-content">
+        <div *ngIf="!isEditingUsername" class="info-display">
+          <span class="info-value">{{ user?.username }}</span>
+          <button class="edit-btn" (click)="startEditingUsername()">
+            <i class="edit-icon">✏️</i> Change Username
+          </button>
+        </div>
+
+        <div *ngIf="isEditingUsername" class="edit-form">
+          <form [formGroup]="usernameForm" (ngSubmit)="updateUsername()">
+            <div class="input-group">
+              <input
+                type="text"
+                formControlName="newUsername"
+                placeholder="Enter new username"
+                class="form-input"
+                [class.error]="
+                  usernameForm.get('newUsername')?.invalid &&
+                  usernameForm.get('newUsername')?.touched
+                "
+              />
+
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="cancel-btn"
+                  (click)="cancelUsernameEdit()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="update-btn"
+                  [disabled]="!canUpdateUsername"
+                  [class.loading]="isUpdatingUsername"
+                >
+                  {{ isUpdatingUsername ? "Updating..." : "Update Username" }}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Username validation errors -->
+          <div
+            *ngIf="
+              usernameForm.get('newUsername')?.invalid &&
+              usernameForm.get('newUsername')?.touched
+            "
+            class="validation-error"
+          >
+            <div *ngIf="usernameForm.get('newUsername')?.errors?.['required']">
+              Username is required
+            </div>
+            <div *ngIf="usernameForm.get('newUsername')?.errors?.['minlength']">
+              Username must be at least 3 characters
+            </div>
+          </div>
+
+          <!-- Username update messages -->
+          <div *ngIf="usernameError" class="error-message">
+            {{ usernameError }}
+          </div>
+          <div *ngIf="usernameSuccess" class="success-message">
+            {{ usernameSuccess }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Section -->
+    <div class="info-item">
+      <label class="info-label">Email</label>
+      <div class="info-content">
+        <div class="info-display">
+          <span class="info-value">{{ user?.email }}</span>
+          <span class="email-verified" *ngIf="user?.isEmailVerified"
+            >✓ Verified</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div class="info-item">
+      <label class="info-label">Password</label>
+      <div class="info-content">
+        <div *ngIf="!isChangingPassword" class="info-display">
+          <span class="info-value">••••••••</span>
+          <button class="edit-btn" (click)="startChangingPassword()">
+            <i class="edit-icon">🔒</i> Change Password
+          </button>
+        </div>
+
+        <div *ngIf="isChangingPassword" class="edit-form">
+          <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+            <div class="password-fields">
+              <div class="input-group">
+                <input
+                  type="password"
+                  formControlName="oldPassword"
+                  placeholder="Enter old password"
+                  class="form-input"
+                  [class.error]="
+                    passwordForm.get('oldPassword')?.invalid &&
+                    passwordForm.get('oldPassword')?.touched
+                  "
+                />
+              </div>
+
+              <div class="input-group">
+                <input
+                  type="password"
+                  formControlName="newPassword"
+                  placeholder="Enter new password"
+                  class="form-input"
+                  [class.error]="
+                    passwordForm.get('newPassword')?.invalid &&
+                    passwordForm.get('newPassword')?.touched
+                  "
+                />
+              </div>
+
+              <div class="input-group">
+                <input
+                  type="password"
+                  formControlName="confirmPassword"
+                  placeholder="Confirm new password"
+                  class="form-input"
+                  [class.error]="
+                    passwordForm.get('confirmPassword')?.invalid &&
+                    passwordForm.get('confirmPassword')?.touched
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="cancel-btn"
+                (click)="cancelPasswordChange()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="update-btn"
+                [disabled]="!canUpdatePassword"
+                [class.loading]="isUpdatingPassword"
+              >
+                {{ isUpdatingPassword ? "Updating..." : "Update Password" }}
+              </button>
+            </div>
+          </form>
+
+          <!-- Password validation errors -->
+          <div class="validation-errors">
+            <div
+              *ngIf="
+                passwordForm.get('oldPassword')?.invalid &&
+                passwordForm.get('oldPassword')?.touched
+              "
+              class="validation-error"
+            >
+              <div
+                *ngIf="passwordForm.get('oldPassword')?.errors?.['required']"
+              >
+                Old password is required
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                passwordForm.get('newPassword')?.invalid &&
+                passwordForm.get('newPassword')?.touched
+              "
+              class="validation-error"
+            >
+              <div
+                *ngIf="passwordForm.get('newPassword')?.errors?.['required']"
+              >
+                New password is required
+              </div>
+              <div
+                *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']"
+              >
+                Password must be at least 6 characters
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                passwordForm.get('confirmPassword')?.invalid &&
+                passwordForm.get('confirmPassword')?.touched
+              "
+              class="validation-error"
+            >
+              <div
+                *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']"
+              >
+                Please confirm your password
+              </div>
+              <div
+                *ngIf="passwordForm.get('confirmPassword')?.errors?.['mismatch']"
+              >
+                Passwords do not match
+              </div>
+            </div>
+          </div>
+
+          <!-- Password update messages -->
+          <div *ngIf="passwordError" class="error-message">
+            {{ passwordError }}
+          </div>
+          <div *ngIf="passwordSuccess" class="success-message">
+            {{ passwordSuccess }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Since Section -->
+
+    <div class="info-item" *ngIf="user?.createdAt">
+      <label class="info-label">Member Since</label>
+      <div class="info-content">
+        <div class="info-display">
+          <span class="info-value">{{
+            user?.createdAt | date : "longDate"
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="info-item logout-section">
+      <button class="logout-btn" (click)="logout()">
+      Logout
+      </button>
+    </div>
+  </div>
+</div>

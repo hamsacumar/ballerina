@@ -25,7 +25,7 @@ export class HeaderComponent {
 
   openSettings(): void {
     this.closeProfileDropdown();
-    this.router.navigate(['/settings']);
+    this.router.navigate(['/profile']);
   }
 
   logout(): void {
