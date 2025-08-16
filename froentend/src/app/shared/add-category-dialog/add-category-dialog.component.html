@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'edit' ? 'Edit Category' : 'Add Category' }}
+</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Category Name</mat-label>
+    <input matInput [(ngModel)]="categoryName">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" color="warn">Cancel</button>
+  <button mat-button (click)="onSave()" color="primary" cdkFocusInitial>
+    {{ data.mode === 'edit' ? 'Update' : 'Save' }}
+  </button>
+</mat-dialog-actions>
