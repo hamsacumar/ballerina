@@ -5,12 +5,22 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors, HttpRequest, HttpHandlerFn } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Functional interceptor
 export const authInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-  const token = localStorage.getItem('token'); // or however you get the auth token
-  const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
-  return next(authReq);
+  const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken' to match what we store
+  if (token) {
+    const authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return next(authReq);
+  }
+  return next(req);
 };
 
 export const appConfig: ApplicationConfig = {
@@ -20,5 +30,8 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptorFn])), // use functional interceptor
     provideAnimations(), // Required for Angular Material dialogs
+    provideAnimationsAsync(),
+    MatSnackBar,
+    MatSnackBarModule
   ]
 };

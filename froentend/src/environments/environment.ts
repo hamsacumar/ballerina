@@ -1,4 +1,7 @@
-export const environment = {
-  production: true,
+import { Environment } from './environment.interface';
+
+export const environment: Environment = {
+  production: false,
+  authApi: 'http://localhost:9092/auth',
   apiBaseUrl: 'http://localhost:9094/api'
 };

@@ -4,8 +4,8 @@
 
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" formControlName="username" placeholder="Enter your email" required>
+        <label for="username">Username</label>
+        <input type="text" id="username" formControlName="username" placeholder="Enter your username" required>
       </div>
 
       <div class="form-group">
@@ -14,9 +14,7 @@
       </div>
 
       <div class="options">
-        <label>
-          any problem with us 
-        </label>
+        <label>any problem with us</label>
         <span class="forgot" (click)="navigateTo('forgotpassword')">Forgot password?</span>
       </div>
 
