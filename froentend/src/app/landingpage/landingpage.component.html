@@ -13,5 +13,9 @@
     <app-forgotpassword-panel *ngIf="activeView === 'forgotpassword'" (viewChange)="setView($event)"></app-forgotpassword-panel>
     <app-forgot-code *ngIf="activeView === 'forgotpasswordcode'" (viewChange)="setView($event)"></app-forgot-code>
     <app-upload-profile-panel *ngIf="activeView === 'profilecode'" (viewChange)="setView($event)"></app-upload-profile-panel>
+    <app-changepassword-panel *ngIf="activeView === 'changepassword'" (viewChange)="setView($event)"></app-changepassword-panel>
   </div>
+  
+  <!-- Router outlet for child routes -->
+  <router-outlet></router-outlet>
 </div>

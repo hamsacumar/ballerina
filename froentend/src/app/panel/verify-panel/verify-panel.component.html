@@ -2,7 +2,6 @@
   <div class="verification-card">
     <h2>Enter Verification Code</h2>
     <p>Please enter the 6-digit verification code sent to {{ email }}</p>
-    
     <form (submit)="onVerify(); $event.preventDefault()">
       <div class="code-container">
         <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[0]" name="c1" required>
@@ -12,7 +11,6 @@
         <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[4]" name="c5" required>
         <input type="text" maxlength="1" class="code-input" [(ngModel)]="code[5]" name="c6" required>
       </div>
-      
       <button type="submit" class="secondary-button">Verify</button>
     </form>
   </div>

@@ -28,28 +28,23 @@ export class RegisterPanelComponent {
   }
 
   onVerify(): void {
-    if (this.registerForm.valid) {
-      const { username, email, password, confirmPassword } = this.registerForm.value;
+  if (this.registerForm.invalid) return;
 
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-
-      const payload: RegisterRequest = { username, email, password };
-
-      this.AuthService .register(payload).subscribe({
-        next: (res) => {
-          console.log('Registration successful', res);
-          this.viewChange.emit('verify');
-        },
-        error: (err) => {
-          console.error('Registration failed', err);
-          alert('Something went wrong. Try again.');
-        }
-      });
-    }
+  const { username, email, password, confirmPassword } = this.registerForm.value;
+  if (password !== confirmPassword) {
+    alert('Passwords do not match');
+    return;
   }
+
+  const payload: RegisterRequest = { username, email, password };
+  this.AuthService.register(payload).subscribe({
+    next: () => {
+      localStorage.setItem('email', email);   // <-- used by verify
+      this.viewChange.emit('verify');         // go to verify screen
+    },
+    error: (e) => alert(e?.error?.message ?? 'Registration failed')
+  });
+}
 
   navigateTo(view: string): void {
     this.viewChange.emit(view);

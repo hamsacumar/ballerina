@@ -14,6 +14,7 @@ import { CategoryService } from '../service/category.service';
 import { LinkService } from '../service/link.service';
 import { Category } from '../model/category.model';
 import { Link } from '../model/link.model';
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -40,12 +41,18 @@ export class HomeComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private categoryService: CategoryService,
-    private linkService: LinkService
+    private linkService: LinkService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.loadCategories();
-    this.visibleCount['all'] = 6; // All section
+    this.visibleCount['all'] = 6; 
+
+    this.authService.getProfile().subscribe({
+    next: (profile) => console.log('User Profile:', profile),
+    error: (err) => console.error('Failed to load profile:', err)
+  });
   }
 
   loadCategories() {
