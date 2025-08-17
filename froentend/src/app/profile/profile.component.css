@@ -6,11 +6,10 @@
   max-width: 280px;
   width: 280px;
   min-height: 150px;
-  height: 100%;
+  height: auto;
   overflow: visible; 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0; 
-  overflow-y: auto; 
   box-sizing: border-box;
 }
 
