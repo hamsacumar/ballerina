@@ -34,22 +34,22 @@ export class ChangepasswordPanelComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     private snackBar: MatSnackBar
-  ) {}
+  ) { }
 
   verificationCode: string = '';
 
   ngOnInit(): void {
     const savedEmail = localStorage.getItem('resetEmail') || '';
     const savedCode = localStorage.getItem('resetCode') || '';
-  
+
     this.changePasswordForm = this.fb.group({
       email: [savedEmail, [Validators.required, Validators.email]],
       verificationCode: [savedCode, [Validators.required, Validators.minLength(6)]],
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordsMatchValidator });
+
   }
-  
 
   // Validator to ensure newPassword and confirmPassword match
   private passwordsMatchValidator(form: FormGroup) {
@@ -60,35 +60,35 @@ export class ChangepasswordPanelComponent implements OnInit {
 
   onChangePassword(): void {
     this.changePasswordForm.markAllAsTouched();
-  
+
     if (this.changePasswordForm.invalid) {
       this.snackBar.open('Please fill in all fields correctly', 'Close', { duration: 5000 });
       return;
     }
-  
+
     const { email, verificationCode, newPassword } = this.changePasswordForm.value;
-  
+
     const snackBarRef = this.snackBar.open('Resetting password...', undefined, { duration: 0 });
-  
-    this.auth.resetPassword({ 
-      email, 
+
+    this.auth.resetPassword({
+      email,
       resetCode: verificationCode,
-      newPassword 
+      newPassword
     }).subscribe({
       next: () => {
         snackBarRef.dismiss();
         this.snackBar.open('Password changed successfully!', 'Close', { duration: 3000, panelClass: 'success-snackbar' });
-  
+
         // ✅ clean localStorage
         localStorage.removeItem('resetEmail');
         localStorage.removeItem('resetCode');
-  
+
         this.viewChange.emit('login');
       },
       error: (err) => {
         snackBarRef.dismiss();
         const errorMessage = err?.error?.message || 'Password change failed. Please try again.';
-        this.snackBar.open(errorMessage, 'Close', { 
+        this.snackBar.open(errorMessage, 'Close', {
           duration: 5000,
           panelClass: 'error-snackbar'
         });
@@ -96,7 +96,7 @@ export class ChangepasswordPanelComponent implements OnInit {
       }
     });
   }
-  
+
 
   navigateTo(view: string): void {
     this.viewChange.emit(view);

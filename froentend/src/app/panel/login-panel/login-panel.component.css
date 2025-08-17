@@ -125,6 +125,52 @@
   font-weight: 500;
 }
 
+/* Error text styling */
+.error small {
+  color: #ff4d4d; /* bright red for errors */
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+/* Invalid input styling */
+.form-group input.ng-invalid.ng-touched {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2);
+}
+
+/* Disable login button when form invalid */
+.login-button:disabled {
+  background-color: rgba(110, 155, 27, 0.5) !important;
+  cursor: not-allowed;
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* space for the eye icon */
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6e9b1b; /* green */
+  font-size: 1.1rem;
+}
+
+.toggle-icon:hover {
+  color: #5a8215;
+}
+
+
 /* Responsive design */
 @media (max-width: 768px) {
   .login-card {
