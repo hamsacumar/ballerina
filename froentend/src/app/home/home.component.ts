@@ -178,7 +178,7 @@ loadAllLinks() {
     return allLinks.slice(0, this.visibleCount[categoryId] || 6);
   }
 
-  /** Increase visible links count */
+  /** Increase visible links counts */
   seeMore(categoryId: string) {
     this.visibleCount[categoryId] = (this.visibleCount[categoryId] || 6) + 6;
   }
