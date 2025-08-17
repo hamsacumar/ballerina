@@ -1,0 +1,157 @@
+.drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.drop-zone.drag-over {
+  border-color: #6e9b1b;
+  background: rgba(110, 155, 27, 0.1);
+}
+
+.upload-icon {
+  width: 50px;
+  margin-bottom: 10px;
+}
+
+.preview-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #6e9b1b;
+}
+
+.file-label {
+  display: inline-block;
+  background: #6e9b1b;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.file-label input {
+  display: none;
+}
+
+
+.upload-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.upload-card {
+  background: rgba(10, 10, 10, 0.486);
+  padding: 40px 30px;
+  border-radius: 16px;
+  border: #6e9b1b 1px solid;
+  width: 400px;
+  max-width: 100%;
+  color: white;
+  text-align: center;
+}
+
+.upload-card h2 {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.drop-zone.drag-over {
+  border-color: #6e9b1b;
+  background: rgba(110, 155, 27, 0.1);
+}
+
+.upload-icon {
+  width: 50px;
+  margin-bottom: 10px;
+}
+
+.drop-zone p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.drop-zone span {
+  display: block;
+  margin: 10px 0;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.file-label {
+  display: inline-block;
+  background: #6e9b1b;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.file-label input {
+  display: none;
+}
+
+.profile-preview {
+  margin-top: 20px;
+}
+
+.profile-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #6e9b1b;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.upload-button {
+  background: #6e9b1b;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.upload-button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}

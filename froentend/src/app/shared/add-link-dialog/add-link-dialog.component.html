@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>
+  {{ data.mode === 'edit' ? 'Edit Shortcut' : 'Add Shortcut' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <!-- Shortcut Name -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="linkName" placeholder="Enter shortcut name" />
+  </mat-form-field>
+
+  <!-- Shortcut URL -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>URL</mat-label>
+    <input matInput [(ngModel)]="linkUrl" placeholder="Enter shortcut URL" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="warn" (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="onDone()" cdkFocusInitial>
+    {{ data.mode === 'edit' ? 'Update' : 'Done' }}
+  </button>
+</mat-dialog-actions>

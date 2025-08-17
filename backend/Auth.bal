@@ -26,6 +26,8 @@ public type User record {|
     boolean isEmailVerified?;
     string? verificationCode?;
     string? verificationExpiry?;
+    string? resetCode?;
+    string? resetExpiry?;
 |};
 
 public type RegisterRequest record {|
@@ -43,6 +45,21 @@ public type LoginRequest record {|
 public type VerifyEmailRequest record {|
     string email;
     string verificationCode;
+|};
+
+public type ForgotPasswordRequest record {|
+    string email;
+|};
+
+public type ResetPasswordRequest record {|
+    string email;
+    string resetCode;
+    string newPassword;
+|};
+
+public type VerifyCodeRequest record {|
+    string email;
+    string code;
 |};
 
 public type AuthResponse record {|
@@ -73,9 +90,11 @@ http:JwtValidatorConfig jwtValidatorConfig = {
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["http://localhost:4200"],
-        allowCredentials: false,
-        allowHeaders: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        allowCredentials: true,
+        allowHeaders: ["Authorization", "Content-Type"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        exposeHeaders: ["*"],
+        maxAge: 3600
     }
 }
 
@@ -150,6 +169,39 @@ Your App Team
             log:printInfo(string `Verification email sent successfully to: ${email}`);
         } on fail error e {
             log:printError(string `Failed to send verification email to ${email}: ${e.message()}`);
+        }
+    }
+
+    private function sendPasswordResetEmail(string email, string resetCode) {
+        log:printInfo(string `Attempting to send password reset email to: ${email}`);
+        
+        email:Message resetEmail = {
+            to: [email],
+            subject: "Password Reset Request - Your App Name",
+            body: string `
+Hello,
+
+We received a request to reset your password for your account.
+
+Your password reset code is: ${resetCode}
+
+This code will expire in 15 minutes. Please use this code to reset your password.
+
+If you didn't request this password reset, please ignore this email and your password will remain unchanged.
+
+For security reasons, please do not share this code with anyone.
+
+Best regards,
+Your App Team
+            `,
+            'from: smtpUsername
+        };
+
+        do {
+            check self.smtpClient->sendMessage(resetEmail);
+            log:printInfo(string `Password reset email sent successfully to: ${email}`);
+        } on fail error e {
+            log:printError(string `Failed to send password reset email to ${email}: ${e.message()}`);
         }
     }
 
@@ -366,6 +418,128 @@ Your App Team
 
         return {
             message: "Verification code resent successfully"
+        };
+    }
+
+    resource function post forgotpassword(ForgotPasswordRequest forgotData) returns AuthResponse|http:BadRequest|http:NotFound|error {
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+        
+        if forgotData.email.length() == 0 {
+            return <http:BadRequest>{
+                body: {"message": "Email is required"}
+            };
+        }
+
+        User? user = check userCollection->findOne({email: forgotData.email});
+        if user is () {
+            // For security reasons, don't reveal if email exists or not
+            return {
+                message: "If an account with this email exists, a password reset code has been sent."
+            };
+        }
+
+        string resetCode = check self.generateVerificationCode();
+        time:Utc currentTime = time:utcNow();
+        time:Utc expiryTime = time:utcAddSeconds(currentTime, 900); // 15 minutes
+
+        // Update user with reset code and expiry
+        mongodb:Update update = {
+            set: {
+                resetCode: resetCode,
+                resetExpiry: time:utcToString(expiryTime)
+            }
+        };
+        
+        mongodb:UpdateResult updateResult = check userCollection->updateOne(
+            {email: forgotData.email},
+            update
+        );
+
+        if updateResult.modifiedCount == 0 {
+            return error("Failed to update reset code");
+        }
+
+        // Send password reset email
+        self.sendPasswordResetEmail(forgotData.email, resetCode);
+        
+        log:printInfo(string `Password reset requested for email: ${forgotData.email}`);
+
+        return {
+            message: "If an account with this email exists, a password reset code has been sent."
+        };
+    }
+
+    resource function post resetpassword(ResetPasswordRequest resetData) returns AuthResponse|http:BadRequest|http:Unauthorized|error {
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+        
+        if resetData.email.length() == 0 || resetData.resetCode.length() == 0 || resetData.newPassword.length() == 0 {
+            return <http:BadRequest>{
+                body: {"message": "Email, reset code, and new password are required"}
+            };
+        }
+
+        if resetData.newPassword.length() < 6 {
+            return <http:BadRequest>{
+                body: {"message": "New password must be at least 6 characters long"}
+            };
+        }
+
+        User? user = check userCollection->findOne({email: resetData.email});
+        if user is () {
+            return <http:Unauthorized>{
+                body: {"message": "Invalid reset request"}
+            };
+        }
+
+        string storedResetCode = user?.resetCode ?: "";
+        if storedResetCode != resetData.resetCode {
+            return <http:Unauthorized>{
+                body: {"message": "Invalid reset code"}
+            };
+        }
+
+        // Check if reset code has expired
+        string? resetExpiryStr = user?.resetExpiry;
+        if resetExpiryStr is string {
+            time:Utc|time:Error expiryTime = time:utcFromString(resetExpiryStr);
+            if expiryTime is time:Utc {
+                time:Utc currentTime = time:utcNow();
+                time:Seconds timeDiff = time:utcDiffSeconds(currentTime, expiryTime);
+                if timeDiff > 0d {
+                    return <http:Unauthorized>{
+                        body: {"message": "Reset code has expired"}
+                    };
+                }
+            }
+        }
+
+        // Hash the new password
+        string hashedNewPassword = check self.hashPassword(resetData.newPassword);
+
+        // Update user password and remove reset code
+        mongodb:Update update = {
+            set: {
+                password: hashedNewPassword
+            },
+            unset: {
+                resetCode: true,
+                resetExpiry: true
+            }
+        };
+        
+        mongodb:UpdateResult updateResult = check userCollection->updateOne(
+            {email: resetData.email},
+            update
+        );
+
+        if updateResult.modifiedCount == 0 {
+            return error("Failed to reset password");
+        }
+
+        log:printInfo(string `Password reset successfully for email: ${resetData.email}`);
+
+        return {
+            message: "Password reset successfully. You can now login with your new password."
         };
     }
 

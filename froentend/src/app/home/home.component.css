@@ -1,0 +1,199 @@
+/* ==================== Container ==================== */
+.home-container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  position: relative;
+  min-height: 70vh;
+}
+
+/* ==================== Header ==================== */
+.header1-text h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.3rem;
+  color: #529511;
+}
+
+.header1-text p {
+  font-size: 1rem;
+  color: #858787;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+/* ==================== Category Section ==================== */
+.category-block {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.category-header h2 {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  color: #333;
+  margin: 0;
+}
+
+/* ==================== Links Grid ==================== */
+.links-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 0.5rem;
+}
+
+/* Individual link cards */
+.link-card, .link-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  min-width: 100px;
+  max-width: 120px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.link-card:hover, .link-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Link images */
+.link-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+/* Link name */
+.link-name {
+  font-size: 12px;
+  word-break: break-word;
+}
+
+/* ==================== See More Button ==================== */
+.see-more {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.see-more button {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #529511;
+}
+
+/* ==================== Add Link Buttons ==================== */
+.add-link-inline {
+  margin-top: 8px;
+}
+
+.add-link-inline button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Add Link - top container button */
+.add-link-container {
+  margin-top: 3%;
+  display: flex;
+  align-items: left;
+}
+
+.add-link-container button {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0;
+  min-width: auto;
+}
+
+/* ==================== Add Category Floating Button ==================== */
+.add-category-container.floating-position {
+  position: fixed;
+  bottom: 120px;
+  right: 100px;
+  z-index: 1000;
+}
+
+.add-category-container button {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0;
+  min-width: auto;
+}
+
+/* ==================== Button Content Styles ==================== */
+.button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.circle-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #529511;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-icon mat-icon {
+  color: white;
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+}
+
+.button-text {
+  color: #070807;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Hover effects */
+.add-category-container button:hover .circle-icon,
+.add-link-container button:hover .circle-icon {
+  background-color: #e6390e;
+}
+
+.add-category-container button:hover .button-text,
+.add-link-container button:hover .button-text {
+  color: #e6390e;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .links-grid {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .link-card, .link-item {
+    min-width: 80px;
+    max-width: 100px;
+  }
+
+  .add-category-container.floating-position {
+    bottom: 80px;
+    right: 20px;
+  }
+}

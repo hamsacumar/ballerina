@@ -1,28 +1,23 @@
 <div class="landing-container">
-  <div class="view-container">
-    <app-login-panel 
-      *ngIf="activeView === 'login'"
-      (viewChange)="setView($event)">
-    </app-login-panel>
-    
-    <app-register-panel 
-      *ngIf="activeView === 'register'"
-      (viewChange)="setView($event)">
-    </app-register-panel>
-    
-    <app-verify-panel
-      *ngIf="activeView === 'verify'"
-      (viewChange)="setView($event)">
-    </app-verify-panel>
-    
-    <app-forgotpassword-panel 
-      *ngIf="activeView === 'forgotpassword'"
-      (viewChange)="setView($event)">
-    </app-forgotpassword-panel>
+  <!-- Background -->
+  <spline-viewer 
+    url="https://prod.spline.design/PPJ2C9quYZw0xRia/scene.splinecode" 
+    class="background-scene">
+  </spline-viewer>
 
-    <app-forgot-code 
-      *ngIf="activeView === 'forgotpasswordcode'"
-      (viewChange)="setView($event)">
-    </app-forgot-code >
+  <!-- Foreground content -->
+  <div class="view-container">
+    <app-login-panel *ngIf="activeView === 'login'" (viewChange)="setView($event)"></app-login-panel>
+    <app-register-panel *ngIf="activeView === 'register'" (viewChange)="setView($event)"></app-register-panel>
+    <app-verify-panel *ngIf="activeView === 'verify'" (viewChange)="setView($event)"></app-verify-panel>
+    <app-forgotpassword-panel *ngIf="activeView === 'forgotpassword'" (viewChange)="setView($event)"></app-forgotpassword-panel>
+    <app-forgot-code *ngIf="activeView === 'forgotpasswordcode'" (viewChange)="setView($event)"></app-forgot-code>
+    <app-upload-profile-panel *ngIf="activeView === 'profilecode'" (viewChange)="setView($event)"></app-upload-profile-panel>
+    <app-changepassword-panel *ngIf="activeView === 'changepassword'" (viewChange)="setView($event)"></app-changepassword-panel>
   </div>
+  
+  <!-- Router outlet for child routes -->
+  <router-outlet></router-outlet>
 </div>
+
+<app-footer></app-footer>
