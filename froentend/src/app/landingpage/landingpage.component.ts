@@ -8,6 +8,7 @@ import { VerifyPanelComponent } from '../panel/verify-panel/verify-panel.compone
 import { ForgotCodeComponent } from "../panel/forgot-code/forgot-code.component";
 import { UploadProfilePanelComponent } from '../panel/upload-profile-panel/upload-profile-panel.component';
 import { ChangepasswordPanelComponent } from '../panel/changepassword-panel/changepassword-panel.component';
+import { FooterComponent } from './footer/footer.component';
 
 @Component({
   selector: 'app-landingpage',
@@ -20,7 +21,8 @@ import { ChangepasswordPanelComponent } from '../panel/changepassword-panel/chan
     VerifyPanelComponent,
     ForgotCodeComponent,
     UploadProfilePanelComponent,
-    ChangepasswordPanelComponent
+    ChangepasswordPanelComponent,
+    FooterComponent
 ],
   templateUrl: './landingpage.component.html',
   styleUrls: ['./landingpage.component.css'],
