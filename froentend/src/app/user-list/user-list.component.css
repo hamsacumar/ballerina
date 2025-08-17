@@ -1,0 +1,295 @@
+/* Admin Dashboard Green Theme */
+.container {
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #f8fffe 0%, #e8f5f2 100%);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(46, 125, 50, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #1b5e20;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  text-shadow: 0 2px 4px rgba(27, 94, 32, 0.3);
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #4caf50, #2e7d32);
+  border-radius: 2px;
+}
+
+.alert {
+  padding: 20px 25px;
+  margin-bottom: 30px;
+  border: none;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.alert-info {
+  color: #155724;
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-left: 5px solid #28a745;
+}
+
+.alert-danger {
+  color: #721c24;
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-left: 5px solid #dc3545;
+}
+
+/* Admin Table Styling */
+.user-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(46, 125, 50, 0.15);
+}
+
+.user-table th {
+  background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  color: white;
+  padding: 18px 20px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: none;
+  position: relative;
+}
+
+.user-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.user-table th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.user-table th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #1b5e20, #43a047);
+}
+
+.user-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid #e8f5e8;
+  color: #2e7d32;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.user-table tbody tr {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.user-table tbody tr:hover {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+}
+
+.user-table tbody tr:nth-child(even) {
+  background-color: #f1f8e9;
+}
+
+.user-table tbody tr:hover:nth-child(even) {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+}
+
+/* Admin Badge Styling for counts */
+.user-table td:nth-child(4),
+.user-table td:nth-child(5) {
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.user-table td:nth-child(4)::before {
+  content: '📅';
+  margin-right: 5px;
+}
+
+.user-table td:nth-child(5)::before {
+  content: '🔗 ';
+  margin-right: 5px;
+}
+
+.user-table td:nth-child(1)::before {
+  content: '📁 ';
+  margin-right: 5px;
+}
+
+/* Email styling */
+.user-table td:nth-child(2) {
+  color: #388e3c;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Date styling */
+.user-table td:nth-child(3),
+.user-table td:nth-child(6) {
+  color: #689f38;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Admin Action Buttons Area (if you want to add later) */
+.admin-actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.admin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+}
+
+/* Stats Cards (if you want to add summary cards) */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  border-left: 5px solid #4caf50;
+  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.15);
+}
+
+.stat-card h3 {
+  color: #1b5e20;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stat-card p {
+  color: #2e7d32;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+    margin: 10px;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+  }
+  
+  .user-table {
+    font-size: 13px;
+  }
+  
+  .user-table th,
+  .user-table td {
+    padding: 10px 12px;
+  }
+  
+  .user-table th {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .user-table {
+    font-size: 12px;
+  }
+  
+  .user-table th,
+  .user-table td {
+    padding: 8px 10px;
+  }
+  
+  /* Stack table on very small screens */
+  .user-table thead {
+    display: none;
+  }
+  
+  .user-table tbody tr {
+    display: block;
+    background: white;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.1);
+    padding: 15px;
+  }
+  
+  .user-table tbody td {
+    display: block;
+    text-align: right;
+    border: none;
+    border-bottom: 1px solid #e8f5e8;
+    padding: 8px 0;
+  }
+  
+  .user-table tbody td:before {
+    content: attr(data-label) ": ";
+    float: left;
+    font-weight: 700;
+    color: #2e7d32;
+  }
+}

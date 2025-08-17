@@ -1,0 +1,36 @@
+<div class="container">
+    <h2>Users List</h2>
+    <div *ngIf="loading" class="alert alert-info">
+        Loading users...
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && !errorMessage">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Lists</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Created At</th>
+                    <th>Links Count</th>
+                    <th>Category Count</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users; let i = index">
+                    <td><span class="row-number">{{ i + 1 }}</span></td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.createdAt | date:'short' }}</td>
+                    <td>{{ user.linkCount }}</td>
+                    <td>{{ user.categoryCount }}</td>
+                    <td>{{ user.lastUpdated | date:'short' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
