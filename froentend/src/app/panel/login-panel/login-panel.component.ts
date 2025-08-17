@@ -27,6 +27,9 @@ import { LoginRequest } from '../../model/login.model';
 export class LoginPanelComponent implements OnInit {
   @Output() viewChange = new EventEmitter<string>();
   loginForm!: FormGroup;
+  showPassword: boolean = false;
+
+
 
   constructor(
     private fb: FormBuilder,
