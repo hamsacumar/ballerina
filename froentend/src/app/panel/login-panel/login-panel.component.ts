@@ -73,59 +73,43 @@ export class LoginPanelComponent implements OnInit {
     console.log('Login form submitted');
     console.log('Form value:', this.loginForm.value);
     console.log('Form valid:', this.loginForm.valid);
-    console.log('Form errors:', this.loginForm.errors);
-
-    // Log individual field status
-    Object.keys(this.loginForm.controls).forEach(key => {
-      const control = this.loginForm.get(key);
-      console.log(`Field ${key}:`, {
-        value: control?.value,
-        valid: control?.valid,
-        errors: control?.errors,
-        dirty: control?.dirty,
-        touched: control?.touched
-      });
-    });
-
+  
     if (this.loginForm.invalid) {
-      console.log('Form is invalid');
       this.snackBar.open('Please fill in all required fields correctly', 'Close', { duration: 5000 });
       return;
     }
-
-    // Use form values directly since they now match the API
+  
     const payload: LoginRequest = this.loginForm.value;
     console.log('Sending login request with payload:', payload);
-
+  
     this.auth.login(payload).subscribe({
       next: (res: LoginResponse) => {
         console.log('Login response received:', res);
-
+  
         if (!res?.token) {
-          console.error('No token in response');
           this.snackBar.open('No authentication token received', 'Close', { duration: 3000 });
           return;
         }
-
+  
         // Store token and user data
         localStorage.setItem('authToken', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
         console.log('Token and user data stored in localStorage');
-
+  
         // Show success message
         this.snackBar.open('Login successful!', 'Close', { duration: 2000 });
-
-        console.log('Emitting viewChange event with:', 'home');
-        console.log('viewChange.observed:', this.viewChange.observed);
-
-        // Emit view change event for parent components (landing page)
-        this.viewChange.emit('home');
-
-        // Only navigate if we're not in the landing page context
-        if (!this.viewChange.observed) {
-          console.log('Navigating to /home via router');
-          this.router.navigate(['/home']);
-        }
+  
+        const role = res.user.role;
+        console.log('User role:', role);
+  
+        // Determine route based on role
+        const route = role === 'admin' ? '/userlist' : '/home';
+  
+        // Emit viewChange for landing page
+        this.viewChange.emit(route);
+        
+        // Always navigate to the route
+        this.router.navigate([route]);
       },
       error: (err) => {
         const errorMessage = err?.error?.message || 'Login failed. Please try again.';

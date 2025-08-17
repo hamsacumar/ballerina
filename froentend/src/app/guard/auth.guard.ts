@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, PLATFORM_ID } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -10,30 +9,27 @@ export class AuthGuard implements CanActivate {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  canActivate(): boolean {
-    console.log('AuthGuard: Checking authentication status');
-    
-    // Check if we're in the browser environment
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (isPlatformBrowser(this.platformId)) {
       const token = localStorage.getItem('authToken');
-      console.log('AuthGuard: Token found in localStorage:', !!token);
-      
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
       if (!token) {
-        console.log('AuthGuard: No token found, redirecting to landing page');
-        this.router.navigate(['/']).then(success => {
-          console.log('AuthGuard: Navigation to landing page successful:', success);
-        }).catch(err => {
-          console.error('AuthGuard: Navigation to landing page failed:', err);
-        });
+        this.router.navigate(['/']); // redirect to landing/login
         return false;
       }
-      
-      console.log('AuthGuard: User is authenticated, allowing access');
-      return true;
+
+      // Check if route has role restriction
+      const allowedRoles = route.data['roles'] as Array<string>;
+      if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+        // user role is not allowed
+        this.router.navigate(['/home']); // redirect to default page
+        return false;
+      }
+
+      return true; // authenticated and role is allowed
     }
-    
-    // For server-side rendering, you might want to handle this case differently
-    console.log('AuthGuard: Server-side rendering detected');
-    return false; // or true based on your requirements
+
+    return false;
   }
 }

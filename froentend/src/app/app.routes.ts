@@ -24,12 +24,18 @@ export const routes: Routes = [
     component: HomeComponent, 
     canActivate: [AuthGuard] 
   },
+  { 
+    path: 'userlist', 
+    component: UserListComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['admin'] }
+  },
   { path: 'test', component: TestComponent },
   { path: 'header', component: HeaderComponent },
   { path: 'footer', component: FooterComponent },
   { path: 'add-link', component: AddLinkDialogComponent },
   // { path: 'home', component:HomeComponent },
-  { path: 'userlist', component: UserListComponent },
+  
   { path: '**', redirectTo: '' } // Catch-all route
  
 ];
