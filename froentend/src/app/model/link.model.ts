@@ -3,8 +3,10 @@ export interface Link {
   name: string;
   url: string;
   icon?: string;
-  categoryId: any;
+  categoryId: string;
   userId?: any;
   createdAt?: string;
   updatedAt?: string;
+    hashedUrl: string;   // ✅ add this
+
 }
