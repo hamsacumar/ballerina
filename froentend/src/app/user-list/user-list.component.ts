@@ -1,16 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-
-interface User {
-  _id: any;
-  name: string;
-  email: string;
-  linkCount: number;
-  categoryCount: number;
-  createdAt: string;
-  lastUpdated: string;
-}
+import { UserService } from '../service/user.service';
+import { User } from '../model/admin_user.model';
 
 @Component({
   selector: 'app-user-list',
@@ -24,25 +15,23 @@ export class UserListComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
     this.fetchUsers();
   }
 
   fetchUsers(): void {
-    this.http.get<User[]>('http://localhost:9093/admin/users')
-      .subscribe({
-        next: (data) => {
-          this.users = data;
-          this.loading = false;
-          console.log('Users loaded:', data);
-        },
-        error: (error) => {
-          console.error('Error loading users:', error);
-          this.errorMessage = 'Failed to load users';
-          this.loading = false;
-        }
-      });
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        this.users = data;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.errorMessage = 'Failed to load users';
+        this.loading = false;
+      }
+    });
   }
 }
