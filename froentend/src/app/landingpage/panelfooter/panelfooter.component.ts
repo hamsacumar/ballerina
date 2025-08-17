@@ -2,12 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-footer',
-  standalone: true,
+  selector: 'app-panelfooter',
   imports: [CommonModule],
-  templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.css']
+  templateUrl: './panelfooter.component.html',
+  styleUrl: './panelfooter.component.css'
 })
-export class FooterComponent {
+export class PanelfooterComponent {
   currentYear = new Date().getFullYear();
 }

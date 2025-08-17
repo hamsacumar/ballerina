@@ -6,23 +6,24 @@ body{
     background-color: #fbfbfb;
 }
 
-/* DARK MODE */
-body.dark-mode {
-    background-color: #121212; /* Dark background */
-    color: #e0e0e0; /* Light text */
-  }
+body.dark-mode,
+body.dark-mode .home-container{
+  background-color: #181818 !important  ;
+}
   
   /* Header and Footer Dark */
   body.dark-mode header.navbar,
   body.dark-mode footer.footer {
-    background-color: #1e1e1e; /* Dark gray */
-    color: #e0e0e0;
+    background-color: #bafd02aa; /* Dark gray */
+  }
+
+  body.dark-mode .home-container .header1-text h1{
+    color: #bafd02aa;
+  }
+
+  body.dark-mode .home-container .header1-text p{
+    color: whitesmoke;
   }
   
-  /* Optional: buttons/links in dark mode */
-  body.dark-mode button {
-    background-color: #2c2c2c;
-    color: #e0e0e0;
-  }
   
   
