@@ -1,3 +1,5 @@
+
+
 /* Main navbar container */
 .navbar {
   position: fixed;
@@ -16,31 +18,37 @@
 /* Navbar content container */
 .navbar-content {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* left = navbar-brand, right = navbar-actions */
   align-items: center;
-}
-
-/* Brand/logo section */
-.navbar-brand {
-  margin-left: 10px;
-}
-
-.navbar-brand .app-name {
   margin: 0;
-  font-size: 1.5em;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.5px;
+
 }
 
-/* Right side actions container */
+/* Right side actions */
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-left: auto; /* ensures it sticks to right */
+}
+
+
+/* Navbar brand/logo */
+.navbar-brand {
+  margin-left: 0;   /* flush to the left */
+  padding-left: 0;  /* remove any inner padding */
+  position: relative; /* reset if needed */
+  left: 0;          /* reset offset */
+}
+
+
+.navbar-logo {
+  height: 70px !important;
+  width: 70px !important;
+  object-fit: contain;
+  border-radius: 4px; 
+  margin-right: 10px;
 }
 
 /* Icon buttons */
@@ -166,6 +174,8 @@
 .dropdown-menu.open .dropdown-item:nth-child(2) {
   animation-delay: 0.2s;
 }
+
+
 /* Logo image */
 .navbar-logo {
   height: 36px;      /* Adjust to fit navbar height */

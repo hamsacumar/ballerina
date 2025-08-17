@@ -22,8 +22,8 @@ body {
 
 /* Rest of your existing footer styles */
 .footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0 ;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,7 +31,7 @@ body {
 
 .footer-left {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.2rem;
 }
 
@@ -41,6 +41,7 @@ body {
 }
 
 .copyright {
+  padding-top: 5px;
   font-size: 0.85rem;
   opacity: 0.9;
 }
@@ -48,13 +49,14 @@ body {
 .footer-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 3rem;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-right: 15px;
 }
 
 .contact-icon {
@@ -63,6 +65,7 @@ body {
 }
 
 .contact-text {
+  padding-left: 5px;
   font-size: 1rem;
   font-weight: 500;
 }
