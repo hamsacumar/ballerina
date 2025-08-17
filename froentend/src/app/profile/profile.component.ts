@@ -13,7 +13,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProfileService } from '../service/profile.service';
-import { ChangePasswordRequest,User } from '../model/profile.model';
+import { ChangePasswordRequest, User } from '../model/profile.model';
 import { Output, EventEmitter } from '@angular/core';
 
 @Component({
@@ -55,6 +55,13 @@ export class ProfileComponent implements OnInit {
   passwordSuccess = '';
   imageSuccess = '';
 
+  // Password visibility and popup states
+  showOldPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+  showUsernameSuccessPopup = false;
+  showPasswordSuccessPopup = false;
+
   constructor() {
     this.usernameForm = this.fb.group({
       newUsername: ['', [Validators.required, Validators.minLength(3)]],
@@ -71,9 +78,9 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     if (typeof localStorage !== 'undefined') {
-       this.loadUserProfile();
-     }
+    if (typeof localStorage !== 'undefined') {
+      this.loadUserProfile();
+    }
   }
 
   loadUserProfile(): void {
@@ -206,6 +213,9 @@ export class ProfileComponent implements OnInit {
         this.usernameSuccess = 'Username updated successfully!';
         this.isEditingUsername = false;
         this.isUpdatingUsername = false;
+        // Show success popup instead of timeout message
+        this.showUsernameSuccessMessage();
+        // Keep the original timeout for the inline message as fallback
         setTimeout(() => (this.usernameSuccess = ''), 3000);
       },
       error: (error) => {
@@ -248,6 +258,9 @@ export class ProfileComponent implements OnInit {
         this.isChangingPassword = false;
         this.isUpdatingPassword = false;
         this.passwordForm.reset();
+        // Show success popup instead of timeout message
+        this.showPasswordSuccessMessage();
+        // Keep the original timeout for the inline message as fallback
         setTimeout(() => (this.passwordSuccess = ''), 3000);
       },
       error: (error) => {
@@ -256,6 +269,44 @@ export class ProfileComponent implements OnInit {
         this.isUpdatingPassword = false;
       },
     });
+  }
+
+  // Password visibility toggle methods
+  toggleOldPassword(): void {
+    this.showOldPassword = !this.showOldPassword;
+  }
+
+  toggleNewPassword(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  // Success popup methods
+  showUsernameSuccessMessage(): void {
+    this.showUsernameSuccessPopup = true;
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      this.closeUsernameSuccessPopup();
+    }, 3000);
+  }
+
+  closeUsernameSuccessPopup(): void {
+    this.showUsernameSuccessPopup = false;
+  }
+
+  showPasswordSuccessMessage(): void {
+    this.showPasswordSuccessPopup = true;
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      this.closePasswordSuccessPopup();
+    }, 3000);
+  }
+
+  closePasswordSuccessPopup(): void {
+    this.showPasswordSuccessPopup = false;
   }
 
   // Utility methods

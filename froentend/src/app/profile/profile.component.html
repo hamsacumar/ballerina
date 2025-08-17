@@ -51,7 +51,7 @@
 
         <div *ngIf="isEditingUsername" class="edit-form">
           <form [formGroup]="usernameForm" (ngSubmit)="updateUsername()">
-            <div class="input-group">
+            <div class="input-group no-toggle">
               <input
                 type="text"
                 formControlName="newUsername"
@@ -137,9 +137,10 @@
         <div *ngIf="isChangingPassword" class="edit-form">
           <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
             <div class="password-fields">
+              <!-- Old Password -->
               <div class="input-group">
                 <input
-                  type="password"
+                  [type]="showOldPassword ? 'text' : 'password'"
                   formControlName="oldPassword"
                   placeholder="Enter old password"
                   class="form-input"
@@ -148,11 +149,55 @@
                     passwordForm.get('oldPassword')?.touched
                   "
                 />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  [class.visible]="showOldPassword"
+                  [class.hidden]="!showOldPassword"
+                  (click)="toggleOldPassword()"
+                >
+                  <!-- Eye Open Icon -->
+                  <svg
+                    *ngIf="!showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+
+                  <!-- Eye Closed/Slash Icon -->
+                  <svg
+                    *ngIf="showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                </button>
               </div>
 
+              <!-- New Password -->
               <div class="input-group">
                 <input
-                  type="password"
+                  [type]="showNewPassword ? 'text' : 'password'"
                   formControlName="newPassword"
                   placeholder="Enter new password"
                   class="form-input"
@@ -161,11 +206,55 @@
                     passwordForm.get('newPassword')?.touched
                   "
                 />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  [class.visible]="showOldPassword"
+                  [class.hidden]="!showOldPassword"
+                  (click)="toggleOldPassword()"
+                >
+                  <!-- Eye Open Icon -->
+                  <svg
+                    *ngIf="!showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+
+                  <!-- Eye Closed/Slash Icon -->
+                  <svg
+                    *ngIf="showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                </button>
               </div>
 
+              <!-- Confirm Password -->
               <div class="input-group">
                 <input
-                  type="password"
+                  [type]="showConfirmPassword ? 'text' : 'password'"
                   formControlName="confirmPassword"
                   placeholder="Confirm new password"
                   class="form-input"
@@ -174,6 +263,49 @@
                     passwordForm.get('confirmPassword')?.touched
                   "
                 />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  [class.visible]="showOldPassword"
+                  [class.hidden]="!showOldPassword"
+                  (click)="toggleOldPassword()"
+                >
+                  <!-- Eye Open Icon -->
+                  <svg
+                    *ngIf="!showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+
+                  <!-- Eye Closed/Slash Icon -->
+                  <svg
+                    *ngIf="showOldPassword"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                </button>
               </div>
             </div>
 
@@ -263,7 +395,6 @@
     </div>
 
     <!-- Member Since Section -->
-
     <div class="info-item" *ngIf="user?.createdAt">
       <label class="info-label">Member Since</label>
       <div class="info-content">
@@ -277,8 +408,48 @@
 
     <!-- Logout Section -->
     <div class="info-item logout-section">
-      <button class="logout-btn" (click)="logout()">
-      Logout
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Popup for Username -->
+<div
+  *ngIf="showUsernameSuccessPopup"
+  class="success-popup-overlay"
+  (click)="closeUsernameSuccessPopup()"
+>
+  <div class="success-popup" (click)="$event.stopPropagation()">
+    <div class="success-popup-content">
+      <div class="success-popup-icon">✅</div>
+      <h3 class="success-popup-title">Success!</h3>
+      <p class="success-popup-message">
+        Your username has been successfully changed to
+        <strong>{{ user?.username }}</strong>
+      </p>
+      <button class="success-popup-close" (click)="closeUsernameSuccessPopup()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Popup for Password -->
+<div
+  *ngIf="showPasswordSuccessPopup"
+  class="success-popup-overlay"
+  (click)="closePasswordSuccessPopup()"
+>
+  <div class="success-popup" (click)="$event.stopPropagation()">
+    <div class="success-popup-content">
+      <div class="success-popup-icon">🔒</div>
+      <h3 class="success-popup-title">Password Updated!</h3>
+      <p class="success-popup-message">
+        Your password has been successfully changed. Please use your new
+        password for future logins.
+      </p>
+      <button class="success-popup-close" (click)="closePasswordSuccessPopup()">
+        OK
       </button>
     </div>
   </div>

@@ -1,16 +1,17 @@
 .profile-container {
   background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 16px;
   max-width: 280px;
   width: 280px;
-  min-height: 150px;
-  height: auto;
-  overflow: visible; 
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0; 
+  height: 100%; 
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
   box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.1); 
 }
 
 .profile-header {
@@ -191,6 +192,58 @@
 
 .input-group {
   margin-bottom: 8px;
+  position: relative;
+}
+
+/* Password Input Group with Toggle */
+.input-group:not(.no-toggle) {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group:not(.no-toggle) .form-input {
+  padding-right: 35px; /* Make room for the eye icon */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  padding: 2px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.password-toggle:hover {
+  background: rgba(82, 149, 17, 0.1);
+  color: #529511;
+}
+
+.password-toggle:focus {
+  outline: none;
+  background: rgba(82, 149, 17, 0.15);
+}
+
+/* Eye icon states */
+.password-toggle.visible {
+  color: #529511;
+}
+
+.password-toggle.hidden {
+  color: #666;
 }
 
 .form-input {
@@ -303,6 +356,119 @@
   margin-top: 6px;
 }
 
+/* Success Popup Styles */
+.success-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.success-popup {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 320px;
+  max-width: 400px;
+  margin: 20px;
+  animation: slideUp 0.3s ease-out;
+}
+
+.success-popup-content {
+  padding: 30px 25px 25px;
+  text-align: center;
+}
+
+.success-popup-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  animation: bounce 0.6s ease-out 0.3s;
+}
+
+.success-popup-title {
+  color: #529511;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.success-popup-message {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 25px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.success-popup-message strong {
+  color: #529511;
+  font-weight: 600;
+}
+
+.success-popup-close {
+  background: #529511;
+  border: none;
+  color: white;
+  padding: 10px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-width: 100px;
+}
+
+.success-popup-close:hover {
+  background: #446a0f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(82, 149, 17, 0.3);
+}
+
+.success-popup-close:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
 /* Scrollbar Styling */
 .profile-container::-webkit-scrollbar {
   width: 4px;
@@ -332,7 +498,8 @@
     overflow-y: visible;
   }
 
-  .profile-image, .profile-image-placeholder {
+  .profile-image,
+  .profile-image-placeholder {
     width: 60px;
     height: 60px;
   }
@@ -356,8 +523,29 @@
     align-self: flex-start;
   }
 
-   .profile-modal-overlay {
-    padding: 70px 45px 20px 15px; /* Adjusted for mobile */
+  .profile-modal-overlay {
+    padding: 70px 45px 20px 15px; 
+  }
+
+  .success-popup {
+    min-width: 280px;
+    margin: 15px;
+  }
+
+  .success-popup-content {
+    padding: 25px 20px 20px;
+  }
+
+  .success-popup-icon {
+    font-size: 40px;
+  }
+
+  .success-popup-title {
+    font-size: 18px;
+  }
+
+  .success-popup-message {
+    font-size: 13px;
   }
 }
 
@@ -367,7 +555,7 @@
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid #e0e0e0;
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 
 .logout-btn {
