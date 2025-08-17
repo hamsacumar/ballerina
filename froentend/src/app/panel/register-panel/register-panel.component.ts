@@ -17,6 +17,9 @@ import { RegisterRequest } from '../../model/register.model';
 export class RegisterPanelComponent {
   @Output() viewChange = new EventEmitter<string>();
   registerForm: FormGroup;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
 
   constructor(private fb: FormBuilder, private AuthService: AuthService) {
     this.registerForm = this.fb.group({

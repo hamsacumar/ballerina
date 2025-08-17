@@ -24,27 +24,39 @@
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" formControlName="password">
-        <div class="error" *ngIf="password?.touched && password?.invalid">
-          <small *ngIf="password?.errors?.['required']">Password is required</small>
-          <small *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</small>
-          <small *ngIf="password?.errors?.['maxlength']">Password cannot exceed 30 characters</small>
-          <small *ngIf="password?.errors?.['pattern']">
-            Must contain 1 uppercase, 1 number, and 1 special character
-          </small>
-        </div>
-      </div>
+  <label for="password">Password</label>
+  <div class="password-input-wrapper">
+    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password">
+    <span class="toggle-icon" (click)="showPassword = !showPassword">
+      <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+  <div class="error" *ngIf="password?.touched && password?.invalid">
+    <small *ngIf="password?.errors?.['required']">Password is required</small>
+    <small *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</small>
+    <small *ngIf="password?.errors?.['maxlength']">Password cannot exceed 30 characters</small>
+    <small *ngIf="password?.errors?.['pattern']">
+      Must contain 1 uppercase, 1 number, and 1 special character
+    </small>
+  </div>
+</div>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" formControlName="confirmPassword">
-        <div class="error"
-          *ngIf="confirmPassword?.touched && (confirmPassword?.invalid || registerForm.hasError('passwordsMismatch'))">
-          <small *ngIf="confirmPassword?.errors?.['required']">Confirm Password is required</small>
-          <small *ngIf="registerForm.hasError('passwordsMismatch')">Passwords do not match</small>
-        </div>
-      </div>
+<div class="form-group">
+  <label for="confirmPassword">Confirm Password</label>
+  <div class="password-input-wrapper">
+    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword">
+    <span class="toggle-icon" (click)="showConfirmPassword = !showConfirmPassword">
+      <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+  <div class="error"
+    *ngIf="confirmPassword?.touched && (confirmPassword?.invalid || registerForm.hasError('passwordsMismatch'))">
+    <small *ngIf="confirmPassword?.errors?.['required']">Confirm Password is required</small>
+    <small *ngIf="registerForm.hasError('passwordsMismatch')">Passwords do not match</small>
+  </div>
+</div>
+
+
 
       <button type="button" (click)="onVerify()" class="verify-button" [disabled]="registerForm.invalid">
         Verify

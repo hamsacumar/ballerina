@@ -130,6 +130,31 @@
   cursor: not-allowed;
 }
 
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* space for eye icon */
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6e9b1b;
+  font-size: 1.1rem;
+}
+
+.toggle-icon:hover {
+  color: #6e9b1b;
+}
+
+
 
 /* Responsive design */
 @media (max-width: 768px) {
