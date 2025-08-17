@@ -7,11 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface LinkDialogData {
-  name?: string;
-  url?: string;
+  name?: string;          // pre-fill for edit
+  url?: string;           // pre-fill for edit
   mode: 'create' | 'edit';
-  id?: string;
-  categoryId: string;
+  id?: string;            // link id for editing
+  categoryId?: string | null; // ✅ allow null/undefined for uncategorized
 }
 
 @Component({
@@ -38,25 +38,34 @@ export class AddLinkDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Pre-fill fields when editing
     if (this.data.mode === 'edit') {
       if (this.data.name) this.linkName = this.data.name;
       if (this.data.url) this.linkUrl = this.data.url;
     }
   }
 
+  /** Close dialog without saving */
   onCancel(): void {
     this.dialogRef.close();
   }
 
+  /** Close dialog and return trimmed data for HomeComponent to save via LinkService */
   onDone(): void {
-    if (!this.linkName.trim() || !this.linkUrl.trim()) return;
-    const finalUrl = this.linkUrl.startsWith('http') ? this.linkUrl : `https://${this.linkUrl}`;
+    const trimmedName = this.linkName.trim();
+    const trimmedUrl = this.linkUrl.trim();
+    if (!trimmedName || !trimmedUrl) return; // prevent empty input
+
+    // Ensure URL starts with http/https
+    const finalUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+
+    // ✅ Always return categoryId (keeps it tied to the category when adding/editing)
     this.dialogRef.close({
-      name: this.linkName.trim(),
+      name: trimmedName,
       url: finalUrl,
       mode: this.data.mode,
       id: this.data.id,
-      categoryId: this.data.categoryId
+      categoryId: this.data.categoryId ?? null
     });
   }
 }

@@ -1,0 +1,15 @@
+/* Dialog content spacing */
+.dialog-content {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Make input fields full width */
+.full-width {
+  width: 100%;
+}
+
+/* Optional: Button spacing */
+mat-dialog-actions button {
+  min-width: 80px;
+}

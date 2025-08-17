@@ -7,26 +7,42 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class LinkService {
   private apiUrl = `${environment.apiBaseUrl}/links`;
-; // Adjust if needed
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Link[]> {
-    return this.http.get<Link[]>(`${this.apiUrl}/all`);
+  /** Get all links (categorized + uncategorized) */
+  getAll(): Observable<{ categorizedLinks: Link[]; uncategorizedLinks: Link[]; totalLinks: number }> {
+    return this.http.get<{ categorizedLinks: Link[]; uncategorizedLinks: Link[]; totalLinks: number }>(
+      `${this.apiUrl}/all`
+    );
   }
 
+  /** Get links by category */
   getByCategory(categoryId: string): Observable<Link[]> {
     return this.http.get<Link[]>(`${this.apiUrl}/category/${categoryId}`);
   }
 
+  /** Create a new link (ALWAYS sends categoryId, even if null) */
   create(data: { name: string; url: string; categoryId?: string | null }): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+    const payload = {
+      name: data.name,
+      url: data.url,
+      categoryId: data.categoryId ?? null // Explicitly send null if undefined
+    };
+    return this.http.post(this.apiUrl, payload);
   }
 
+  /** Update an existing link (ALWAYS sends categoryId, even if null) */
   update(id: string, data: { name: string; url: string; categoryId?: string | null }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
+    const payload = {
+      name: data.name,
+      url: data.url,
+      categoryId: data.categoryId ?? null // Explicitly send null if undefined
+    };
+    return this.http.put(`${this.apiUrl}/${id}`, payload);
   }
 
+  /** Delete a link */
   remove(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

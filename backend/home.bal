@@ -72,11 +72,14 @@ public type JWTPayload record {|
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["http://localhost:4200"],
-        allowCredentials: false,
-        allowHeaders: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        allowCredentials: true,
+        allowHeaders: ["Authorization", "Content-Type"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        exposeHeaders: ["*"],
+        maxAge: 3600
     }
 }
+
 
 service /api on new http:Listener(9094) {
     private final http:ListenerJwtAuthHandler jwtHandler;
