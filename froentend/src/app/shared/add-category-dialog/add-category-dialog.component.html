@@ -1,15 +1,17 @@
 <h2 mat-dialog-title>
   {{ data.mode === 'edit' ? 'Edit Category' : 'Add Category' }}
 </h2>
-<mat-dialog-content>
-  <mat-form-field appearance="fill">
+
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="fill" class="full-width">
     <mat-label>Category Name</mat-label>
-    <input matInput [(ngModel)]="categoryName">
+    <input matInput [(ngModel)]="categoryName" placeholder="Enter category name" />
   </mat-form-field>
 </mat-dialog-content>
+
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()" color="warn">Cancel</button>
-  <button mat-button (click)="onSave()" color="primary" cdkFocusInitial>
+  <button mat-stroked-button color="warn" (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="onSave()" cdkFocusInitial>
     {{ data.mode === 'edit' ? 'Update' : 'Save' }}
   </button>
 </mat-dialog-actions>

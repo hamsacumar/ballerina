@@ -21,7 +21,7 @@ export interface CategoryDialogData {
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
+    MatButtonModule
   ],
   templateUrl: './add-category-dialog.component.html',
   styleUrls: ['./add-category-dialog.component.css']
@@ -41,13 +41,16 @@ export class AddCategoryDialogComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(); // closes without saving
   }
 
   onSave(): void {
-    if (!this.categoryName.trim()) return; // validation
+    const trimmedName = this.categoryName.trim();
+    if (!trimmedName) return; // prevent empty category
+
+    // Close dialog and return data to HomeComponent
     this.dialogRef.close({
-      name: this.categoryName.trim(),
+      name: trimmedName,
       mode: this.data.mode,
       id: this.data.id
     });

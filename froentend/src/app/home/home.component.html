@@ -1,4 +1,5 @@
 <app-header></app-header>
+
 <div class="home-container">
 
   <!-- Header -->
@@ -7,37 +8,37 @@
     <p>Build your personal link library</p>
   </div>
 
-  <!-- ALL LINKS -->
+  <!-- ALL LINKS SECTION -->
   <section class="category-block">
     <div class="category-header">
       <h2>ALL</h2>
     </div>
+
     <div class="links-grid">
       <div *ngFor="let l of visibleLinks('all')" class="link-item">
         <button class="link-button" (click)="window.open(l.url, '_blank')">
-          <img [src]="l.icon || 'assets/default-favicon.png'" class="link-icon">
+          <img [src]="l.icon || 'assets/default-favicon.png'" class="link-icon" />
           <span>{{ l.name }}</span>
         </button>
       </div>
     </div>
+
     <div class="see-more" *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)">
       <button mat-button (click)="seeMore('all')">See more</button>
     </div>
-    <!-- Add Link Button - Placed under "All" heading -->
-<div class="add-link-container">
-  <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
-    <div class="button-content">
-      <div class="circle-icon">
-        <mat-icon>add</mat-icon>
-      </div>
-      <span class="button-text">Add Link</span>
+
+    <!-- Add Link Button for "ALL" -->
+    <div class="add-link-container">
+      <button mat-raised-button color="primary" (click)="openAddLinkDialog()">
+        <div class="button-content">
+          <div class="circle-icon"><mat-icon>add</mat-icon></div>
+          <span class="button-text">Add Link</span>
+        </div>
+      </button>
     </div>
-  </button>
-</div>
-  
   </section>
 
-  <!-- CATEGORIES -->
+  <!-- USER CATEGORIES -->
   <section *ngFor="let cat of categories" class="category-block">
     <div class="category-header">
       <h2>{{ cat.name }}</h2>
@@ -53,7 +54,7 @@
     <div class="links-grid">
       <div *ngFor="let l of visibleLinks(cat._id!)" class="link-card">
         <button class="link-icon" (click)="window.open(l.url, '_blank')">
-          <img [src]="l.icon || 'assets/default-favicon.png'" alt="">
+          <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
         </button>
         <div class="link-name">{{ l.name }}</div>
         <button mat-icon-button [matMenuTriggerFor]="linkMenu">
@@ -77,15 +78,16 @@
     </div>
   </section>
 
-  <!-- Add Category Button - Bottom right floating position -->
-<div class="add-category-container floating-position">
-  <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
-    <div class="button-content">
-      <div class="circle-icon">
-        <mat-icon>add</mat-icon>
+  <!-- Floating Add Category Button -->
+  <div class="add-category-container floating-position">
+    <button mat-raised-button color="primary" (click)="openAddCategoryDialog()">
+      <div class="button-content">
+        <div class="circle-icon"><mat-icon>add</mat-icon></div>
+        <span class="button-text">Add Category</span>
       </div>
-      <span class="button-text">Add Category</span>
-    </div>
-  </button>
+    </button>
+  </div>
+
 </div>
+
 <app-footer></app-footer>
