@@ -29,15 +29,15 @@ import { Link } from '../model/link.model';
     FooterComponent,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   // Store categories & links
   categories: Category[] = [];
-  linksMap: Record<string, Link[]> = {};  // { "all": [...], "catId1": [...], ... }
+  linksMap: Record<string, Link[]> = {}; // { "all": [...], "catId1": [...], ... }
   visibleCount: Record<string, number> = {}; // { "all": 6, "catId1": 6, ... }
 
   // Loading flags
@@ -61,7 +61,7 @@ export class HomeComponent implements OnInit {
     // Debug: fetch user profile (to confirm JWT works)
     this.authService.getProfile().subscribe({
       next: (profile) => console.log('User Profile:', profile),
-      error: (err) => console.error('Failed to load profile:', err)
+      error: (err) => console.error('Failed to load profile:', err),
     });
   }
 
@@ -76,7 +76,7 @@ export class HomeComponent implements OnInit {
         this.categories = cats;
 
         // Init visible count + load links for each category
-        cats.forEach(cat => {
+        cats.forEach((cat) => {
           this.visibleCount[cat._id || ''] = 6;
           if (cat._id) this.loadLinks(cat._id);
         });
@@ -86,7 +86,7 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load categories:', err);
         this.loading.categories = false;
-      }
+      },
     });
 
     // Load "ALL" section separately
@@ -97,14 +97,14 @@ export class HomeComponent implements OnInit {
   openAddCategoryDialog() {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
       width: '400px',
-      data: { mode: 'create', name: '' }
+      data: { mode: 'create', name: '' },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.categoryService.create({ name: result.name }).subscribe({
           next: () => this.loadCategories(),
-          error: (err) => console.error('Failed to create category:', err)
+          error: (err) => console.error('Failed to create category:', err),
         });
       }
     });
@@ -114,14 +114,14 @@ export class HomeComponent implements OnInit {
   openEditCategory(cat: Category) {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
       width: '400px',
-      data: { mode: 'edit', name: cat.name, id: cat._id }
+      data: { mode: 'edit', name: cat.name, id: cat._id },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.categoryService.update(cat._id!, { name: result.name }).subscribe({
           next: () => this.loadCategories(),
-          error: (err) => console.error('Failed to update category:', err)
+          error: (err) => console.error('Failed to update category:', err),
         });
       }
     });
@@ -131,8 +131,11 @@ export class HomeComponent implements OnInit {
   deleteCategory(cat: Category) {
     if (confirm(`Delete category "${cat.name}"?`)) {
       this.categoryService.remove(cat._id!).subscribe({
-        next: () => this.loadCategories(),
-        error: (err) => console.error('Failed to delete category:', err)
+        next: () => {
+          this.loadCategories();
+          this.loadAllLinks(); // ✅ refresh all after deletion
+        },
+        error: (err) => console.error('Failed to delete category:', err),
       });
     }
   }
@@ -140,27 +143,31 @@ export class HomeComponent implements OnInit {
   // ====================== LINK OPERATIONS ======================
 
   /** Load all links (for "ALL" section) */
-/** Load all links (for "ALL" section) */
-loadAllLinks() {
-  this.linkService.getAll().subscribe({
-    next: (res) => {
-      // Combine categorized + uncategorized links into 'all'
-      const allLinks = [
-        ...(res.categorizedLinks || []),
-        ...(res.uncategorizedLinks || [])
-      ];
-      this.linksMap['all'] = allLinks;
-    },
-    error: (err) => console.error('Failed to load all links:', err)
-  });
-}
-
+  /** Load all links (for "ALL" section) */
+  loadAllLinks() {
+    this.linkService.getAll().subscribe({
+      next: (res) => {
+        // Combine categorized + uncategorized links into 'all'
+        const allLinks = [
+          ...(res.categorizedLinks || []),
+          ...(res.uncategorizedLinks || []),
+        ];
+        this.linksMap['all'] = allLinks;
+      },
+      error: (err) => console.error('Failed to load all links:', err),
+    });
+  }
 
   /** Load links for a specific category */
   loadLinks(categoryId: string) {
     this.loading.links[categoryId] = true;
 
-    this.linkService.getByCategory(categoryId).subscribe({
+    const fetch$ =
+      categoryId === 'categorized'
+        ? this.linkService.getByCategory('uncategorized')
+        : this.linkService.getByCategory(categoryId);
+
+    fetch$.subscribe({
       next: (links: Link[]) => {
         this.linksMap[categoryId] = Array.isArray(links) ? links : [];
         this.loading.links[categoryId] = false;
@@ -168,13 +175,15 @@ loadAllLinks() {
       error: (err) => {
         console.error(`Failed to load links for category ${categoryId}:`, err);
         this.loading.links[categoryId] = false;
-      }
+      },
     });
   }
 
   /** Return visible links with pagination */
   visibleLinks(categoryId: string): Link[] {
-    const allLinks = Array.isArray(this.linksMap[categoryId]) ? this.linksMap[categoryId] : [];
+    const allLinks = Array.isArray(this.linksMap[categoryId])
+      ? this.linksMap[categoryId]
+      : [];
     return allLinks.slice(0, this.visibleCount[categoryId] || 6);
   }
 
@@ -184,24 +193,30 @@ loadAllLinks() {
   }
 
   /** Open dialog to add link (either under category or in ALL) */
+  /** Open dialog to add link (either under category or in ALL) */
   openAddLinkDialog(cat?: Category) {
     const dialogRef = this.dialog.open(AddLinkDialogComponent, {
       width: '400px',
-      data: { mode: 'create', categoryId: cat?._id || '' }
+      data: {
+        mode: 'create',
+        categoryId: cat?._id ?? null, // ✅ Pass the actual category ID
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.linkService.create({
+        const payload: any = {
           name: result.name,
           url: result.url,
-          categoryId: result.categoryId || null
-        }).subscribe({
+          categoryId: result.categoryId ?? null,
+        };
+
+        this.linkService.create(payload).subscribe({
           next: () => {
             this.loadAllLinks();
             if (result.categoryId) this.loadLinks(result.categoryId);
           },
-          error: (err) => console.error('Failed to create link:', err)
+          error: (err) => console.error('Failed to create link:', err),
         });
       }
     });
@@ -209,23 +224,33 @@ loadAllLinks() {
 
   /** Open dialog to edit existing link */
   openEditLink(catId: string, link: Link) {
+    const originalUrl = this.decodeUrl(link.hashedUrl);
     const dialogRef = this.dialog.open(AddLinkDialogComponent, {
       width: '400px',
-      data: { mode: 'edit', id: link._id, name: link.name, url: link.url, categoryId: catId }
+      data: {
+        mode: 'edit',
+        id: link._id,
+        name: link.name,
+        url: originalUrl,
+        categoryId: catId,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.linkService.update(link._id!, {
+        const payload: any = {
           name: result.name,
           url: result.url,
-          categoryId: result.categoryId
-        }).subscribe({
+          categoryId: result.categoryId ?? null, // ✅ always send categoryId
+        };
+
+        this.linkService.update(link._id!, payload).subscribe({
           next: () => {
             this.loadAllLinks();
-            this.loadLinks(catId);
+            if (result.categoryId) this.loadLinks(result.categoryId); // new category
+            if (catId !== result.categoryId) this.loadLinks(catId); // old category
           },
-          error: (err) => console.error('Failed to update link:', err)
+          error: (err) => console.error('Failed to update link:', err),
         });
       }
     });
@@ -239,8 +264,24 @@ loadAllLinks() {
           this.loadAllLinks();
           this.loadLinks(catId);
         },
-        error: (err) => console.error('Failed to delete link:', err)
+        error: (err) => console.error('Failed to delete link:', err),
       });
     }
+  }
+
+  // Add this method to your HomeComponent class
+  decodeUrl(encodedUrl: string): string {
+    try {
+      return atob(encodedUrl); // Decode base64 to original URL
+    } catch (error) {
+      console.error('Failed to decode URL:', error);
+      return 'https://google.com'; // Fallback URL
+    }
+  }
+
+  // Method to safely open links
+  openLink(link: Link): void {
+    const originalUrl = this.decodeUrl(link.hashedUrl);
+    window.open(originalUrl, '_blank');
   }
 }

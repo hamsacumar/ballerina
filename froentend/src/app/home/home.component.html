@@ -1,7 +1,6 @@
 <app-header></app-header>
 
 <div class="home-container">
-
   <!-- Header -->
   <div class="header1-text">
     <h1>Tab Wallet</h1>
@@ -16,14 +15,23 @@
 
     <div class="links-grid">
       <div *ngFor="let l of visibleLinks('all')" class="link-item">
-        <button class="link-button" (click)="window.open(l.url, '_blank')">
-          <img [src]="l.icon || 'assets/default-favicon.png'" class="link-icon" />
+        <button
+          class="link-button"
+          (click)="window.open(decodeUrl(l.hashedUrl), '_blank')"
+        >
+          <img
+            [src]="l.icon || 'assets/default-favicon.png'"
+            class="link-icon"
+          />
           <span>{{ l.name }}</span>
         </button>
       </div>
     </div>
 
-    <div class="see-more" *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)">
+    <div
+      class="see-more"
+      *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)"
+    >
       <button mat-button (click)="seeMore('all')">See more</button>
     </div>
 
@@ -53,7 +61,10 @@
 
     <div class="links-grid">
       <div *ngFor="let l of visibleLinks(cat._id!)" class="link-card">
-        <button class="link-icon" (click)="window.open(l.url, '_blank')">
+        <button
+          class="link-icon"
+          (click)="window.open(decodeUrl(l.hashedUrl), '_blank')"
+        >
           <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
         </button>
         <div class="link-name">{{ l.name }}</div>
@@ -61,13 +72,20 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #linkMenu="matMenu">
-          <button mat-menu-item (click)="openEditLink(cat._id!, l)">Edit</button>
-          <button mat-menu-item (click)="deleteLink(cat._id!, l)">Remove</button>
+          <button mat-menu-item (click)="openEditLink(cat._id!, l)">
+            Edit
+          </button>
+          <button mat-menu-item (click)="deleteLink(cat._id!, l)">
+            Remove
+          </button>
         </mat-menu>
       </div>
     </div>
 
-    <div class="see-more" *ngIf="visibleLinks(cat._id!).length < (linksMap[cat._id!]?.length || 0)">
+    <div
+      class="see-more"
+      *ngIf="visibleLinks(cat._id!).length < (linksMap[cat._id!]?.length || 0)"
+    >
       <button mat-button (click)="seeMore(cat._id!)">See more</button>
     </div>
 
@@ -87,7 +105,6 @@
       </div>
     </button>
   </div>
-
 </div>
 
 <app-footer></app-footer>
