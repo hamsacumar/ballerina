@@ -15,6 +15,20 @@ export class HeaderComponent {
 
   constructor(private router: Router) {}
 
+  isDarkMode = false;
+isBackendMode = false;
+
+toggleDarkMode() {
+  this.isDarkMode = !this.isDarkMode;
+
+  if (this.isDarkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+
+
   toggleProfileDropdown(): void {
     this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
   }
