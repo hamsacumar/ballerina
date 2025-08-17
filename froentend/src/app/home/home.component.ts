@@ -128,14 +128,18 @@ export class HomeComponent implements OnInit {
   }
 
   /** Delete category + its links */
-  deleteCategory(cat: Category) {
-    if (confirm(`Delete category "${cat.name}"?`)) {
-      this.categoryService.remove(cat._id!).subscribe({
-        next: () => this.loadCategories(),
-        error: (err) => console.error('Failed to delete category:', err)
-      });
-    }
+deleteCategory(cat: Category) {
+  if (confirm(`Delete category "${cat.name}"?`)) {
+    this.categoryService.remove(cat._id!).subscribe({
+      next: () => {
+        this.loadCategories();
+        this.loadAllLinks(); // ✅ refresh all after deletion
+      },
+      error: (err) => console.error('Failed to delete category:', err)
+    });
   }
+}
+
 
   // ====================== LINK OPERATIONS ======================
 
@@ -158,19 +162,24 @@ loadAllLinks() {
 
   /** Load links for a specific category */
   loadLinks(categoryId: string) {
-    this.loading.links[categoryId] = true;
+  this.loading.links[categoryId] = true;
 
-    this.linkService.getByCategory(categoryId).subscribe({
-      next: (links: Link[]) => {
-        this.linksMap[categoryId] = Array.isArray(links) ? links : [];
-        this.loading.links[categoryId] = false;
-      },
-      error: (err) => {
-        console.error(`Failed to load links for category ${categoryId}:`, err);
-        this.loading.links[categoryId] = false;
-      }
-    });
-  }
+  const fetch$ = categoryId === 'categorized'
+    ? this.linkService.getByCategory('uncategorized')
+    : this.linkService.getByCategory(categoryId);
+
+  fetch$.subscribe({
+    next: (links: Link[]) => {
+      this.linksMap[categoryId] = Array.isArray(links) ? links : [];
+      this.loading.links[categoryId] = false;
+    },
+    error: (err) => {
+      console.error(`Failed to load links for category ${categoryId}:`, err);
+      this.loading.links[categoryId] = false;
+    }
+  });
+}
+
 
   /** Return visible links with pagination */
   visibleLinks(categoryId: string): Link[] {
@@ -184,52 +193,60 @@ loadAllLinks() {
   }
 
   /** Open dialog to add link (either under category or in ALL) */
-  openAddLinkDialog(cat?: Category) {
-    const dialogRef = this.dialog.open(AddLinkDialogComponent, {
-      width: '400px',
-      data: { mode: 'create', categoryId: cat?._id || '' }
-    });
+openAddLinkDialog(cat?: Category) {
+  const dialogRef = this.dialog.open(AddLinkDialogComponent, {
+    width: '400px',
+    data: {
+      mode: 'create',
+      categoryId: cat?._id ?? null
+    }
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.linkService.create({
-          name: result.name,
-          url: result.url,
-          categoryId: result.categoryId || null
-        }).subscribe({
-          next: () => {
-            this.loadAllLinks();
-            if (result.categoryId) this.loadLinks(result.categoryId);
-          },
-          error: (err) => console.error('Failed to create link:', err)
-        });
-      }
-    });
-  }
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      const payload: any = {
+        name: result.name,
+        url: result.url,
+        categoryId: result.categoryId ?? null // ✅ always send categoryId
+      };
+
+      this.linkService.create(payload).subscribe({
+        next: () => {
+          this.loadAllLinks();
+          if (result.categoryId) this.loadLinks(result.categoryId);
+        },
+        error: (err) => console.error('Failed to create link:', err)
+      });
+    }
+  });
+}
 
   /** Open dialog to edit existing link */
   openEditLink(catId: string, link: Link) {
-    const dialogRef = this.dialog.open(AddLinkDialogComponent, {
-      width: '400px',
-      data: { mode: 'edit', id: link._id, name: link.name, url: link.url, categoryId: catId }
-    });
+  const dialogRef = this.dialog.open(AddLinkDialogComponent, {
+    width: '400px',
+    data: { mode: 'edit', id: link._id, name: link.name, url: link.url, categoryId: catId }
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.linkService.update(link._id!, {
-          name: result.name,
-          url: result.url,
-          categoryId: result.categoryId
-        }).subscribe({
-          next: () => {
-            this.loadAllLinks();
-            this.loadLinks(catId);
-          },
-          error: (err) => console.error('Failed to update link:', err)
-        });
-      }
-    });
-  }
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      const payload: any = {
+        name: result.name,
+        url: result.url,
+        categoryId: result.categoryId ?? null // ✅ always send categoryId
+      };
+
+      this.linkService.update(link._id!, payload).subscribe({
+        next: () => {
+          this.loadAllLinks();
+          if (result.categoryId) this.loadLinks(result.categoryId); // new category
+          if (catId !== result.categoryId) this.loadLinks(catId);   // old category
+        },
+        error: (err) => console.error('Failed to update link:', err)
+      });
+    }
+  });
+}
 
   /** Delete link from category + "ALL" */
   deleteLink(catId: string, link: Link) {

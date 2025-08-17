@@ -11,7 +11,7 @@ export interface LinkDialogData {
   url?: string;           // pre-fill for edit
   mode: 'create' | 'edit';
   id?: string;            // link id for editing
-  categoryId: string;     // category under which this link belongs
+  categoryId?: string | null; // ✅ allow null/undefined for uncategorized
 }
 
 @Component({
@@ -59,13 +59,13 @@ export class AddLinkDialogComponent implements OnInit {
     // Ensure URL starts with http/https
     const finalUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
 
-    // Pass data back to HomeComponent for DB save
+    // ✅ Always return categoryId (keeps it tied to the category when adding/editing)
     this.dialogRef.close({
       name: trimmedName,
       url: finalUrl,
       mode: this.data.mode,
       id: this.data.id,
-      categoryId: this.data.categoryId
+      categoryId: this.data.categoryId ?? null
     });
   }
 }
