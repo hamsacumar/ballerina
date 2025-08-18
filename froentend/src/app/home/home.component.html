@@ -8,15 +8,29 @@
     <p>Build your personal link library</p>
   </div>
 
-  <!-- Search Bar --> <div class="search-container"> 
-    <div class="search-input-container"> <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="search-input" (keyup.enter)="handleSearch()" /> <button class="search-button" (click)="handleSearch()">Search</button> </div> <button class="clear-button" *ngIf="searchQuery" (click)="clearSearch()">Clear</button> </div>
+<!-- Search Bar -->
+<div class="search-container">
+  <div class="search-input-container">
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Search..."
+      class="search-input"
+      (keyup.enter)="handleSearch()"
+    />
+    <button class="search-button" (click)="handleSearch()">Search</button>
+  </div>
+  <button class="clear-button" *ngIf="searchQuery" (click)="clearSearch()">Clear</button>
+</div>
 
+<!-- Search error -->
+<div *ngIf="searchError" class="search-error">{{ searchError }}</div>
 <!-- Search Results -->
 <div class="search-results-container" *ngIf="!searching && (searchLinks.length || searchCategories.length)">
   
   <!-- Categories -->
   <div *ngIf="searchCategories.length" class="result-section">
-    <h3>Categories</h3>
+    <h3 class="left-align">Categories</h3> <!-- Added left-align class -->
     <div class="result-grid">
       <button
         *ngFor="let cat of searchCategories"
@@ -30,7 +44,7 @@
 
   <!-- Links -->
   <div *ngIf="searchLinks.length" class="result-section">
-    <h3>Links</h3>
+    <h3 class="left-align">Links</h3> <!-- Added left-align class -->
     <div class="circle-grid">
       <div *ngFor="let link of searchLinks" class="circle-link">
         <a [href]="link.hashedUrl" target="_blank" class="circle-button">
@@ -41,9 +55,10 @@
     </div>
   </div>
 
-  <!-- Divider -->
-  <div class="results-divider"></div>
+  <!-- Divider with more space -->
+  <div class="results-divider-large"></div> <!-- Changed class name -->
 </div>
+  
 
   <!-- ALL LINKS SECTION (rest of your existing code remains exactly the same) -->
   <section class="category-block">
