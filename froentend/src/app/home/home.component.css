@@ -136,9 +136,9 @@
   font-weight: bold;
   color: #fff;
   background-color: #529511;
-  border-radius: 11px;
-  padding: 1px 5px 1px 5px;       /* smaller size */
-  font-size: 11px;         /* reduce text size */
+  border-radius: 20px;
+  padding: 1px 8px 1px upx;       /* smaller size */
+  font-size: 12px;         /* reduce text size */
   cursor: pointer;
   display: inline-flex;
   align-items: center;     /* fix alignment (not 'left') */
