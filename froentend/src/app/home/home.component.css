@@ -125,16 +125,44 @@
 }
 
 /* ==================== See More Button ==================== */
+/* ==================== See More Button ==================== */
 .see-more {
-  text-align: left;
-  margin: 12px 0;
+  text-align: left; 
+  padding-top: 15px;  
+  padding-left: 25px;     /* Aligns the button to the left */
 }
 
 .see-more button {
-  text-transform: uppercase;
   font-weight: bold;
-  color: #529511;
+  color: #fff;
+  background-color: #529511;
+  border-radius: 20px;
+  padding: 1px 8px 1px upx;       /* smaller size */
+  font-size: 12px;         /* reduce text size */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;     /* fix alignment (not 'left') */
+  gap: 10px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
+.see-more button:hover {
+  background-color: #417a0d;
+  transform: translateY(-2px);
+}
+
+
+/* Arrow style */
+.arrow-down {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 4px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #fff; /* White arrow */
+}
+
 
 /* ==================== Add Box (Link & Category) ==================== */
 .add-box {

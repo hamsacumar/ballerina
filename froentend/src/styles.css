@@ -1,29 +1,175 @@
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-body{
-    background-color: #fbfbfb;
-}
-
+/* ==================== Global Dark Mode ==================== */
 body.dark-mode,
-body.dark-mode .home-container{
-  background-color: #1d1b1b !important  ;
+body.dark-mode .home-container {
+  background-color: #232222 !important;
+  color: #f5f5f5; /* default text color */
 }
-  
-  /* Header and Footer Dark */
-  body.dark-mode header.navbar,
-  body.dark-mode footer.footer {
-    background-color: #5d7e02; /* Dark gray */
+
+/* Header and Footer Dark */
+body.dark-mode header.navbar,
+body.dark-mode footer.footer {
+  background-color: #5d7e02;
+}
+
+body.dark-mode .home-container .header1-text h1 {
+  color: #bafd02aa; /* neon green shade */
+}
+
+body.dark-mode .home-container .header1-text p {
+  color: #e0e0e0;
+}
+
+/* ==================== Category Section ==================== */
+body.dark-mode .home-container .category-header h2 {
+  color: #bafd02aa;
+}
+
+body.dark-mode .home-container .category-block {
+  border-bottom: 1px solid #444; /* softer divider */
+}
+
+/* ==================== Links Grid ==================== */
+body.dark-mode .link-name {
+  color: #f5f5f5; /* white text */
+}
+
+/* ==================== Circular Link Buttons ==================== */
+body.dark-mode .circle-link-button {
+  background-color: #2e2e2e;
+  border: 1px solid #444;
+}
+
+body.dark-mode .circle-link-button:hover {
+  border-color: #bafd02aa;
+  box-shadow: 0 4px 12px rgba(186, 253, 2, 0.3);
+}
+
+body.dark-mode .circle-link-button img {
+  filter: brightness(0.9); /* slightly dim icons for contrast */
+}
+
+/* ==================== See More Button ==================== */
+body.dark-mode .see-more button {
+  background-color: #5d7e02;
+  color: #fff;
+}
+
+body.dark-mode .see-more button:hover {
+  background-color: #7ca902;
+}
+
+/* ==================== Add Box (Link & Category) ==================== */
+body.dark-mode .add-box {
+  background-color: #111;
+  border: 1px solid #444;
+}
+
+body.dark-mode .add-box .circle-icon {
+  background-color: #5d7e02;
+}
+
+body.dark-mode .add-box .button-text {
+  color: #f5f5f5;
+}
+
+/* ==================== Floating Add Category ==================== */
+body.dark-mode .floating-position {
+  /* keep as-is, will inherit background */
+}
+
+/* ==================== Search ==================== */
+body.dark-mode .search-container {
+  background-color: #232222;
+}
+
+body.dark-mode .search-input-container {
+  border: 1px solid #7ca902;
+  background-color: #2e2e2e;
+}
+
+body.dark-mode .search-input {
+  background-color: transparent;
+  color: #fff;
+}
+
+body.dark-mode .search-button {
+  background-color: #333;
+  color: #bafd02aa;
+  border-left: 1px solid #7ca902;
+}
+
+body.dark-mode .search-button:hover {
+  background-color: #7ca902;
+  color: #fff;
+}
+
+body.dark-mode .clear-button {
+  border: 1px solid #ff5c5c;
+  color: #ff5c5c;
+}
+
+body.dark-mode .clear-button:hover {
+  background-color: #b22819;
+  color: #fff;
+}
+
+/* ==================== Results ==================== */
+body.dark-mode .result-section h3 {
+  color: #f5f5f5;
+}
+
+body.dark-mode .result-btn.category-btn {
+  background: #2e2e2e;
+  border: 1px solid #444;
+  color: #f5f5f5;
+}
+
+body.dark-mode .result-btn.category-btn:hover {
+  background: #3a3a3a;
+  border-color: #bafd02aa;
+}
+
+body.dark-mode .circle-button {
+  background: #2e2e2e;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .circle-button:hover {
+  background: #3a3a3a;
+}
+
+body.dark-mode .circle-text {
+  color: #f5f5f5;
+}
+
+/* Divider */
+body.dark-mode .results-divider-large {
+  background-color: #444;
+}
+
+/* No Results */
+body.dark-mode .no-results {
+  color: #bbb;
+}
+
+
+
+
+
+  body.dark-mode .home-container .add-box .button-text {
+    color: #fbfbfb;
   }
 
-  body.dark-mode .home-container .header1-text h1{
-    color: #bafd02aa;
+
+
+
+
+  /* seach buttons */
+  body.dark-mode .home-container .search-button {
+    background-color: rgb(29, 29, 28);
   }
 
-  body.dark-mode .home-container .header1-text p{
-    color: whitesmoke;
+  body.dark-mode .home-container .search-container {
+
+    background-color: #232222
   }
-  
-  
-  

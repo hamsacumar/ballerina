@@ -99,12 +99,15 @@
       </div>
     </div>
 
-    <div
-      class="see-more"
-      *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)"
-    >
-      <button mat-button (click)="seeMore('all')">See more</button>
-    </div>
+   <div
+  class="see-more"
+  *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)"
+>
+  <button mat-button (click)="seeMore('all')">
+    View More <span class="arrow-down"></span>
+  </button>
+</div>
+
   </section>
 
   <!-- USER CATEGORIES (rest of your existing code remains exactly the same) -->
