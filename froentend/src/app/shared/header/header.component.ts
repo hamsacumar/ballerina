@@ -1,17 +1,19 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ProfileComponent } from '../../profile/profile.component'; // Import ProfileComponent
 
 @Component({
   selector: 'app-header',
-  standalone: true, // Mark as standalone
-  imports: [CommonModule, RouterModule], // Required for *ngIf and routerLink
+  standalone: true,
+  imports: [CommonModule, RouterModule, ProfileComponent], // Add ProfileComponent here
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
 })
+
 export class HeaderComponent {
   @ViewChild('profileDropdown', { static: false }) profileDropdown!: ElementRef;
-  isProfileDropdownOpen = false;
+  isProfileModalOpen = false; // Changed from isProfileDropdownOpen
 
   constructor(private router: Router) {}
 
@@ -29,34 +31,34 @@ toggleDarkMode() {
 }
 
 
-  toggleProfileDropdown(): void {
-    this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
+  toggleProfileModal(): void {
+    // Renamed method
+    this.isProfileModalOpen = !this.isProfileModalOpen;
   }
 
-  closeProfileDropdown(): void {
-    this.isProfileDropdownOpen = false;
-  }
-
-  openSettings(): void {
-    this.closeProfileDropdown();
-    this.router.navigate(['/settings']);
+  closeProfileModal(): void {
+    // Renamed method
+    this.isProfileModalOpen = false;
   }
 
   logout(): void {
-    this.closeProfileDropdown();
+    this.closeProfileModal(); // Updated method name
     localStorage.removeItem('userToken');
     this.router.navigate(['/login']);
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (this.profileDropdown && !this.profileDropdown.nativeElement.contains(event.target)) {
-      this.closeProfileDropdown();
+    if (
+      this.profileDropdown &&
+      !this.profileDropdown.nativeElement.contains(event.target)
+    ) {
+      this.closeProfileModal(); // Updated method name
     }
   }
 
   @HostListener('document:keydown.escape')
   onEscapeKey() {
-    this.closeProfileDropdown();
+    this.closeProfileModal(); // Updated method name
   }
 }

@@ -1,11 +1,11 @@
-import ballerina/http;
-import ballerinax/mongodb;
-import ballerina/jwt;
 import ballerina/crypto;
-import ballerina/time;
 import ballerina/email;
-import ballerina/random;
+import ballerina/http;
+import ballerina/jwt;
 import ballerina/log;
+import ballerina/random;
+import ballerina/time;
+import ballerinax/mongodb;
 
 // Configuration - add email configuration
 configurable string jwtSecret = ?;
@@ -104,7 +104,7 @@ service /auth on new http:Listener(9092) {
 
     function init() returns error? {
         self.jwtHandler = new (jwtValidatorConfig);
-        
+
         // Initialize SMTP client with correct configuration for Gmail
         email:SmtpConfiguration smtpConfig = {
             port: smtpPort,
@@ -143,7 +143,7 @@ service /auth on new http:Listener(9092) {
 
     private function sendVerificationEmail(string email, string verificationCode) {
         log:printInfo(string `Attempting to send verification email to: ${email}`);
-        
+
         email:Message verificationEmail = {
             to: [email],
             subject: "Email Verification - Your App Name",
@@ -174,7 +174,7 @@ Your App Team
 
     private function sendPasswordResetEmail(string email, string resetCode) {
         log:printInfo(string `Attempting to send password reset email to: ${email}`);
-        
+
         email:Message resetEmail = {
             to: [email],
             subject: "Password Reset Request - Your App Name",
@@ -211,7 +211,7 @@ Your App Team
 
     resource function post register(RegisterRequest registerData) returns AuthResponse|http:BadRequest|http:Conflict|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         User? existingUser = check userCollection->findOne({username: registerData.username});
         if existingUser is User {
             return <http:Conflict>{
@@ -240,11 +240,11 @@ Your App Team
 
         string hashedPassword = check self.hashPassword(registerData.password);
         string verificationCode = check self.generateVerificationCode();
-        
+
         // Set verification expiry to 15 minutes from now
         time:Utc currentTime = time:utcNow();
         time:Utc expiryTime = time:utcAddSeconds(currentTime, 900); // 15 minutes = 900 seconds
-        
+
         User newUser = {
             username: registerData.username,
             email: registerData.email,
@@ -276,7 +276,7 @@ Your App Team
 
     resource function post verifyemail(VerifyEmailRequest verifyData) returns AuthResponse|http:BadRequest|http:Unauthorized|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         if verifyData.email.length() == 0 || verifyData.verificationCode.length() == 0 {
             return <http:BadRequest>{
                 body: {"message": "Email and verification code are required"}
@@ -328,7 +328,7 @@ Your App Team
                 verificationExpiry: true
             }
         };
-        
+
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: verifyData.email},
             update
@@ -357,7 +357,7 @@ Your App Team
 
         jwt:ClientSelfSignedJwtAuthProvider jwtProvider = new (issuerConfig);
         string|jwt:Error token = jwtProvider.generateToken();
-        
+
         if token is jwt:Error {
             return error("Failed to generate token");
         }
@@ -372,7 +372,7 @@ Your App Team
 
     resource function post resend\-verification(@http:Payload json resendData) returns AuthResponse|http:BadRequest|http:NotFound|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         map<json> requestData = <map<json>>resendData;
         string? email = <string?>requestData["email"];
         if email is () || email.length() == 0 {
@@ -402,11 +402,11 @@ Your App Team
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: email},
             {
-                "$set": {
-                    "verificationCode": verificationCode,
-                    "verificationExpiry": time:utcToString(expiryTime)
-                }
+            "$set": {
+                "verificationCode": verificationCode,
+                "verificationExpiry": time:utcToString(expiryTime)
             }
+        }
         );
 
         if updateResult.modifiedCount == 0 {
@@ -423,7 +423,7 @@ Your App Team
 
     resource function post forgotpassword(ForgotPasswordRequest forgotData) returns AuthResponse|http:BadRequest|http:NotFound|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         if forgotData.email.length() == 0 {
             return <http:BadRequest>{
                 body: {"message": "Email is required"}
@@ -449,7 +449,7 @@ Your App Team
                 resetExpiry: time:utcToString(expiryTime)
             }
         };
-        
+
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: forgotData.email},
             update
@@ -461,7 +461,7 @@ Your App Team
 
         // Send password reset email
         self.sendPasswordResetEmail(forgotData.email, resetCode);
-        
+
         log:printInfo(string `Password reset requested for email: ${forgotData.email}`);
 
         return {
@@ -471,7 +471,7 @@ Your App Team
 
     resource function post resetpassword(ResetPasswordRequest resetData) returns AuthResponse|http:BadRequest|http:Unauthorized|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         if resetData.email.length() == 0 || resetData.resetCode.length() == 0 || resetData.newPassword.length() == 0 {
             return <http:BadRequest>{
                 body: {"message": "Email, reset code, and new password are required"}
@@ -526,7 +526,7 @@ Your App Team
                 resetExpiry: true
             }
         };
-        
+
         mongodb:UpdateResult updateResult = check userCollection->updateOne(
             {email: resetData.email},
             update
@@ -545,7 +545,7 @@ Your App Team
 
     resource function post login(LoginRequest loginData) returns AuthResponse|http:BadRequest|http:Unauthorized|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         if loginData.username.length() == 0 || loginData.password.length() == 0 {
             return <http:BadRequest>{
                 body: {"message": "Username and password are required"}
@@ -553,7 +553,7 @@ Your App Team
         }
 
         User? user = check userCollection->findOne({username: loginData.username});
-        
+
         if user is () {
             return <http:Unauthorized>{
                 body: {"message": "Invalid username or password"}
@@ -593,7 +593,7 @@ Your App Team
 
         jwt:ClientSelfSignedJwtAuthProvider jwtProvider = new (issuerConfig);
         string|jwt:Error token = jwtProvider.generateToken();
-        
+
         if token is jwt:Error {
             return error("Failed to generate token");
         }
@@ -605,9 +605,9 @@ Your App Team
         };
     }
 
-    resource function get profile(@http:Header string Authorization) 
+    resource function get profile(@http:Header string Authorization)
             returns UserResponse|http:Unauthorized|http:Forbidden|error {
-        
+
         jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(Authorization);
         if authn is http:Unauthorized {
             return authn;
@@ -620,14 +620,14 @@ Your App Team
 
         jwt:Payload payload = <jwt:Payload>authn;
         string? username = <string?>payload["username"];
-        
+
         if username is () {
             return error("Invalid token: missing username");
         }
 
         mongodb:Collection userCollection = check myDb->getCollection("users");
         User? user = check userCollection->findOne({username: username});
-        
+
         if user is () {
             return error("User not found");
         }
@@ -637,14 +637,14 @@ Your App Team
 
     resource function post setup/admin() returns json|error {
         mongodb:Collection userCollection = check myDb->getCollection("users");
-        
+
         User? existingAdmin = check userCollection->findOne({username: "admin"});
         if existingAdmin is User {
             return {"message": "Admin user already exists"};
         }
 
         string hashedPassword = check self.hashPassword("admin123");
-        
+
         User adminUser = {
             username: "admin",
             email: "admin@example.com",
@@ -658,11 +658,154 @@ Your App Team
         if insertResult is mongodb:Error {
             return error("Failed to create admin user");
         }
-        
+
         return {
-            "message": "Admin user created successfully", 
-            "username": "admin", 
+            "message": "Admin user created successfully",
+            "username": "admin",
             "password": "admin123"
         };
+    }
+
+    // Fixed Update username endpoint
+    resource function put update\-username(@http:Header string Authorization, @http:Payload json updateData)
+        returns json|http:BadRequest|http:Unauthorized|http:Forbidden|error {
+
+        // Authenticate and authorize user
+        jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(Authorization);
+        if authn is http:Unauthorized {
+            return authn;
+        }
+
+        http:Forbidden? authz = self.jwtHandler.authorize(<jwt:Payload>authn, ["admin", "user"]);
+        if authz is http:Forbidden {
+            return authz;
+        }
+
+        jwt:Payload payload = <jwt:Payload>authn;
+        string? currentUsername = <string?>payload["username"];
+
+        if currentUsername is () {
+            return error("Invalid token: missing username");
+        }
+
+        map<json> requestData = <map<json>>updateData;
+        string? newUsername = <string?>requestData["newUsername"];
+
+        if newUsername is () || newUsername.length() < 3 {
+            return <http:BadRequest>{
+                body: {"message": "Username must be at least 3 characters long"}
+            };
+        }
+
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+
+        // Check if new username already exists
+        User? existingUser = check userCollection->findOne({username: newUsername});
+        if existingUser is User && existingUser.username != currentUsername {
+            return <http:BadRequest>{
+                body: {"message": "Username already exists"}
+            };
+        }
+
+        // FIXED: Update username using mongodb:Update record
+        mongodb:Update update = {
+            set: {
+                username: newUsername
+            }
+        };
+        mongodb:UpdateResult updateResult = check userCollection->updateOne(
+            {username: currentUsername},
+            update
+        );
+
+        if updateResult.modifiedCount == 0 {
+            return error("Failed to update username");
+        }
+
+        return {"message": "Username updated successfully"};
+    }
+
+    // Fixed Update password endpoint
+    resource function put update\-password(@http:Header string Authorization, @http:Payload json passwordData)
+        returns json|http:BadRequest|http:Unauthorized|http:Forbidden|error {
+
+        // Authenticate and authorize user
+        jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(Authorization);
+        if authn is http:Unauthorized {
+            return authn;
+        }
+
+        http:Forbidden? authz = self.jwtHandler.authorize(<jwt:Payload>authn, ["admin", "user"]);
+        if authz is http:Forbidden {
+            return authz;
+        }
+
+        jwt:Payload payload = <jwt:Payload>authn;
+        string? username = <string?>payload["username"];
+
+        if username is () {
+            return error("Invalid token: missing username");
+        }
+
+        map<json> requestData = <map<json>>passwordData;
+        string? oldPassword = <string?>requestData["oldPassword"];
+        string? newPassword = <string?>requestData["newPassword"];
+        string? confirmPassword = <string?>requestData["confirmPassword"];
+
+        if oldPassword is () || newPassword is () || confirmPassword is () {
+            return <http:BadRequest>{
+                body: {"message": "Old password, new password, and confirmation are required"}
+            };
+        }
+
+        if newPassword != confirmPassword {
+            return <http:BadRequest>{
+                body: {"message": "New passwords do not match"}
+            };
+        }
+
+        if newPassword.length() < 6 {
+            return <http:BadRequest>{
+                body: {"message": "New password must be at least 6 characters long"}
+            };
+        }
+
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+        User? user = check userCollection->findOne({username: username});
+
+        if user is () {
+            return <http:Unauthorized>{
+                body: {"message": "User not found"}
+            };
+        }
+
+        // Verify old password
+        string userPassword = user.password ?: "";
+        boolean isValidPassword = check self.verifyPassword(oldPassword, userPassword);
+        if !isValidPassword {
+            return <http:Unauthorized>{
+                body: {"message": "Current password is incorrect"}
+            };
+        }
+
+        // Hash new password
+        string hashedNewPassword = check self.hashPassword(newPassword);
+
+        // FIXED: Update password using mongodb:Update record
+        mongodb:Update update = {
+            set: {
+                password: hashedNewPassword
+            }
+        };
+        mongodb:UpdateResult updateResult = check userCollection->updateOne(
+            {username: username},
+            update
+        );
+
+        if updateResult.modifiedCount == 0 {
+            return error("Failed to update password");
+        }
+
+        return {"message": "Password updated successfully"};
     }
 }

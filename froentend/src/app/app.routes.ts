@@ -8,16 +8,17 @@ import { AddLinkDialogComponent } from './shared/add-link-dialog/add-link-dialog
 import { LandingpageComponent } from './landingpage/landingpage.component';
 import { UserListComponent } from './user-list/user-list.component';
 // import { HomeComponent } from './home/home.component';
+import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../app/guard/auth.guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     component: LandingpageComponent,
     children: [
       { path: 'login', redirectTo: '', pathMatch: 'full' },
-      { path: 'register', redirectTo: '', pathMatch: 'full' }
-    ]
+      { path: 'register', redirectTo: '', pathMatch: 'full' },
+    ],
   },
   { 
     path: 'home', 
@@ -36,6 +37,8 @@ export const routes: Routes = [
   { path: 'add-link', component: AddLinkDialogComponent },
   // { path: 'home', component:HomeComponent },
   
-  { path: '**', redirectTo: '' } // Catch-all route
+  { path: '**', redirectTo: '' }, // Catch-all route
  
+  { path: 'profile', component: ProfileComponent },
+  { path: '**', redirectTo: '' }, // Catch-all route
 ];
