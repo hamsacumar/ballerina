@@ -59,58 +59,269 @@ public type UserTableResponse record {|
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["http://localhost:4200"],
-        allowCredentials: false,
-        allowHeaders: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        allowCredentials: true,
+        allowHeaders: ["Authorization", "Content-Type"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        exposeHeaders: ["*"],
+        maxAge: 3600
     }
 }
-
 service /admin on new http:Listener(9093) {
 
     function init() returns error? {
         log:printInfo("Admin service initialized successfully");
     }
 
-    // Utility function to get user's link count
-    private function getUserLinkCount(json userId) returns int|error {
+    // FIXED: Utility function to get user's link count using username as fallback
+    private function getUserLinkCount(json userId, string username) returns int|error {
         mongodb:Collection linkCollection = check myDb->getCollection("links");
         
-        int count = check linkCollection->countDocuments({userId: userId});
-        return count;
+        // Debug: Log the userId format
+        log:printInfo("Fetching link count for userId: " + userId.toString() + ", username: " + username);
+        
+        int count = 0;
+        
+        // Try to use the userId ObjectId
+        if userId != () {
+            // Try different ObjectId formats
+            
+            // First try: Direct match
+            do {
+                count = check linkCollection->countDocuments({userId: userId});
+                log:printInfo("Direct ObjectId match - Link count: " + count.toString());
+                if count > 0 {
+                    return count;
+                }
+            } on fail var e {
+                log:printDebug("Direct ObjectId match failed: " + e.toString());
+            }
+            
+            // Second try: String format
+            do {
+                string userIdStr = userId.toString();
+                if userIdStr.startsWith("\"") && userIdStr.endsWith("\"") {
+                    userIdStr = userIdStr.substring(1, userIdStr.length() - 1);
+                }
+                count = check linkCollection->countDocuments({userId: userIdStr});
+                log:printInfo("String format match - Link count: " + count.toString());
+                if count > 0 {
+                    return count;
+                }
+            } on fail var e {
+                log:printDebug("String format match failed: " + e.toString());
+            }
+            
+            // Third try: Extract ObjectId string
+            do {
+                if userId is map<json> {
+                    json? oidValue = userId["$oid"];
+                    if oidValue is string {
+                        count = check linkCollection->countDocuments({userId: oidValue});
+                        log:printInfo("Extracted OID match - Link count: " + count.toString());
+                        if count > 0 {
+                            return count;
+                        }
+                    }
+                }
+            } on fail var e {
+                log:printDebug("Extracted OID match failed: " + e.toString());
+            }
+        }
+        
+        // Fallback: Try using username if your links collection stores usernames
+        do {
+            count = check linkCollection->countDocuments({username: username});
+            log:printInfo("Username fallback match - Link count: " + count.toString());
+            if count > 0 {
+                return count;
+            }
+        } on fail var e {
+            log:printDebug("Username fallback match failed: " + e.toString());
+        }
+        
+        log:printWarn("No links found for user: " + username);
+        return 0;
     }
 
-    // Utility function to get user's category count
-    private function getUserCategoryCount(json userId) returns int|error {
+    // FIXED: Utility function to get user's category count using username as fallback
+    private function getUserCategoryCount(json userId, string username) returns int|error {
         mongodb:Collection categoryCollection = check myDb->getCollection("categories");
         
-        int count = check categoryCollection->countDocuments({userId: userId});
-        return count;
+        // Debug: Log the userId format
+        log:printInfo("Fetching category count for userId: " + userId.toString() + ", username: " + username);
+        
+        int count = 0;
+        
+        // Try to use the userId ObjectId
+        if userId != () {
+            // Try different ObjectId formats
+            
+            // First try: Direct match
+            do {
+                count = check categoryCollection->countDocuments({userId: userId});
+                log:printInfo("Direct ObjectId match - Category count: " + count.toString());
+                if count > 0 {
+                    return count;
+                }
+            } on fail var e {
+                log:printDebug("Direct ObjectId match failed: " + e.toString());
+            }
+            
+            // Second try: String format
+            do {
+                string userIdStr = userId.toString();
+                if userIdStr.startsWith("\"") && userIdStr.endsWith("\"") {
+                    userIdStr = userIdStr.substring(1, userIdStr.length() - 1);
+                }
+                count = check categoryCollection->countDocuments({userId: userIdStr});
+                log:printInfo("String format match - Category count: " + count.toString());
+                if count > 0 {
+                    return count;
+                }
+            } on fail var e {
+                log:printDebug("String format match failed: " + e.toString());
+            }
+            
+            // Third try: Extract ObjectId string
+            do {
+                if userId is map<json> {
+                    json? oidValue = userId["$oid"];
+                    if oidValue is string {
+                        count = check categoryCollection->countDocuments({userId: oidValue});
+                        log:printInfo("Extracted OID match - Category count: " + count.toString());
+                        if count > 0 {
+                            return count;
+                        }
+                    }
+                }
+            } on fail var e {
+                log:printDebug("Extracted OID match failed: " + e.toString());
+            }
+        }
+        
+        // Fallback: Try using username
+        do {
+            count = check categoryCollection->countDocuments({username: username});
+            log:printInfo("Username fallback match - Category count: " + count.toString());
+            if count > 0 {
+                return count;
+            }
+        } on fail var e {
+            log:printDebug("Username fallback match failed: " + e.toString());
+        }
+        
+        log:printWarn("No categories found for user: " + username);
+        return 0;
     }
 
-    // Utility function to get user's last updated timestamp from links collection
-    private function getUserLastUpdated(json userId) returns string|error {
+    // FIXED: Utility function to get user's last updated timestamp using username as fallback
+    private function getUserLastUpdated(json userId, string username) returns string|error {
         mongodb:Collection linkCollection = check myDb->getCollection("links");
 
-        // Find the most recent update from links
+        // Debug: Log the userId format
+        log:printInfo("Fetching last updated for userId: " + userId.toString() + ", username: " + username);
+
+        // Try updatedAt first, then createdAt as fallback
         mongodb:FindOptions linkOptions = {
             sort: {"updatedAt": -1},
             'limit: 1
         };
 
-        stream<record {|string updatedAt; anydata...;|}, error?> linkStream =
-            check linkCollection->find({userId: userId}, linkOptions);
-
         string lastUpdated = "";
-        error? linkError = linkStream.forEach(function(record {|string updatedAt; anydata...;|} link) {
-            lastUpdated = link.updatedAt;
-        });
-
-        if linkError is error {
-            log:printError("Error fetching latest update: " + linkError.toString());
-            return "";
+        
+        // Try to use the userId ObjectId
+        if userId != () {
+            // Try different ObjectId formats to find the most recent link
+            
+            // First try: Direct match
+            do {
+                stream<record {|string updatedAt; anydata...;|}, error?> linkStream =
+                    check linkCollection->find({userId: userId}, linkOptions);
+                
+                error? linkError = linkStream.forEach(function(record {|string updatedAt; anydata...;|} link) {
+                    lastUpdated = link.updatedAt;
+                });
+                
+                if linkError is error {
+                    log:printDebug("Direct match stream error: " + linkError.toString());
+                } else if lastUpdated != "" {
+                    log:printInfo("Direct ObjectId match - Last updated: " + lastUpdated);
+                    return lastUpdated;
+                }
+            } on fail var e {
+                log:printDebug("Direct ObjectId match failed: " + e.toString());
+            }
+            
+            // Second try: String format
+            do {
+                string userIdStr = userId.toString();
+                if userIdStr.startsWith("\"") && userIdStr.endsWith("\"") {
+                    userIdStr = userIdStr.substring(1, userIdStr.length() - 1);
+                }
+                
+                stream<record {|string updatedAt; anydata...;|}, error?> linkStream =
+                    check linkCollection->find({userId: userIdStr}, linkOptions);
+                
+                error? linkError = linkStream.forEach(function(record {|string updatedAt; anydata...;|} link) {
+                    lastUpdated = link.updatedAt;
+                });
+                
+                if linkError is error {
+                    log:printDebug("String match stream error: " + linkError.toString());
+                } else if lastUpdated != "" {
+                    log:printInfo("String format match - Last updated: " + lastUpdated);
+                    return lastUpdated;
+                }
+            } on fail var e {
+                log:printDebug("String format match failed: " + e.toString());
+            }
+            
+            // Third try: Extract ObjectId string
+            do {
+                if userId is map<json> {
+                    json? oidValue = userId["$oid"];
+                    if oidValue is string {
+                        stream<record {|string updatedAt; anydata...;|}, error?> linkStream =
+                            check linkCollection->find({userId: oidValue}, linkOptions);
+                        
+                        error? linkError = linkStream.forEach(function(record {|string updatedAt; anydata...;|} link) {
+                            lastUpdated = link.updatedAt;
+                        });
+                        
+                        if linkError is error {
+                            log:printDebug("Extracted OID match stream error: " + linkError.toString());
+                        } else if lastUpdated != "" {
+                            log:printInfo("Extracted OID match - Last updated: " + lastUpdated);
+                            return lastUpdated;
+                        }
+                    }
+                }
+            } on fail var e {
+                log:printDebug("Extracted OID match failed: " + e.toString());
+            }
         }
         
-        return lastUpdated;
+        // Fallback: Try using username
+        do {
+            stream<record {|string updatedAt; anydata...;|}, error?> linkStream =
+                check linkCollection->find({username: username}, linkOptions);
+            
+            error? linkError = linkStream.forEach(function(record {|string updatedAt; anydata...;|} link) {
+                lastUpdated = link.updatedAt;
+            });
+            
+            if linkError is error {
+                log:printDebug("Username fallback stream error: " + linkError.toString());
+            } else if lastUpdated != "" {
+                log:printInfo("Username fallback match - Last updated: " + lastUpdated);
+                return lastUpdated;
+            }
+        } on fail var e {
+            log:printDebug("Username fallback match failed: " + e.toString());
+        }
+        
+        log:printWarn("No last updated found for user: " + username);
+        return "";
     }
 
     // Health check endpoint
@@ -118,31 +329,91 @@ service /admin on new http:Listener(9093) {
         return {"status": "healthy", "service": "admin", "timestamp": time:utcNow()};
     }
 
-    // Get all users data for table format
+    // Debug endpoint to check database contents
+    resource function get debug/counts() returns json|http:InternalServerError {
+        do {
+            mongodb:Collection linkCollection = check myDb->getCollection("links");
+            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+            mongodb:Collection userCollection = check myDb->getCollection("users");
+
+            int totalLinks = check linkCollection->countDocuments({});
+            int totalCategories = check categoryCollection->countDocuments({});
+            int totalUsers = check userCollection->countDocuments({});
+
+            return {
+                "totalUsers": totalUsers,
+                "totalLinks": totalLinks,
+                "totalCategories": totalCategories,
+                "message": "Database collection counts"
+            };
+        } on fail var e {
+            return <http:InternalServerError>{
+                body: {"message": "Failed to get counts: " + e.toString()}
+            };
+        }
+    }
+
+    // FIXED: Get all users data with explicit _id field inclusion and username fallback
     resource function get users() returns UserTableResponse[]|http:InternalServerError {
 
         do {
             mongodb:Collection userCollection = check myDb->getCollection("users");
             
-            // Get all users
-            stream<record {|anydata...;|}, error?> userStream = check userCollection->find({});
+            // Get all users with explicit _id field inclusion
+            stream<record {|json _id; anydata...;|}, error?> userStream = check userCollection->find({});
             
             UserTableResponse[] userDetails = [];
             
-            check userStream.forEach(function(record {|anydata...;|} user) {
+            check userStream.forEach(function(record {|json _id; anydata...;|} user) {
                 do {
-                    json userId = <json>user["_id"];
+                    // DEBUG: Log the entire user document structure
+                    log:printInfo("Raw user document: " + user.toString());
+                    
+                    // Extract user data - now _id should be available
+                    json userIdRaw = user._id;
                     string name = <string>(user["username"] ?: "");
                     string email = <string>(user["email"] ?: "");
                     string createdAt = <string>(user["createdAt"] ?: "");
 
-                    // Get counts for this user
-                    int linkCount = check self.getUserLinkCount(userId);
-                    int categoryCount = check self.getUserCategoryCount(userId);
-                    string lastUpdated = check self.getUserLastUpdated(userId);
+                    // Debug: Log the _id format
+                    log:printInfo("User " + name + " has _id: " + userIdRaw.toString());
+
+                    // Use the actual _id from database
+                    json userIdJson = userIdRaw;
+                    
+                    log:printInfo("Processing user: " + name + " with ID: " + userIdJson.toString());
+
+                    // Get counts for this user with error handling (using username as fallback)
+                    int linkCount = 0;
+                    int categoryCount = 0;
+                    string lastUpdated = "";
+
+                    // Try to get link count
+                    do {
+                        linkCount = check self.getUserLinkCount(userIdRaw, name);
+                    } on fail var e {
+                        log:printError("Failed to get link count for user " + name + ": " + e.toString());
+                        linkCount = 0;
+                    }
+
+                    // Try to get category count
+                    do {
+                        categoryCount = check self.getUserCategoryCount(userIdRaw, name);
+                    } on fail var e {
+                        log:printError("Failed to get category count for user " + name + ": " + e.toString());
+                        categoryCount = 0;
+                    }
+
+                    // Try to get last updated
+                    do {
+                        lastUpdated = check self.getUserLastUpdated(userIdRaw, name);
+                    } on fail var e {
+                        log:printError("Failed to get last updated for user " + name + ": " + e.toString());
+                        lastUpdated = "";
+                    }
 
                     UserTableResponse userDetail = {
-                        _id: userId,
+                        _id: userIdJson,
                         name: name,
                         email: email,
                         createdAt: createdAt,
@@ -152,11 +423,16 @@ service /admin on new http:Listener(9093) {
                     };
 
                     userDetails.push(userDetail);
+                    log:printInfo("Successfully processed user: " + name + 
+                                 " (Links: " + linkCount.toString() + 
+                                 ", Categories: " + categoryCount.toString() + 
+                                 ", LastUpdated: " + lastUpdated + ")");
                 } on fail var e {
                     log:printError("Error processing user: " + e.toString());
                 }
             });
 
+            log:printInfo("Successfully fetched " + userDetails.length().toString() + " users");
             return userDetails;
         } on fail var e {
             log:printError("Failed to retrieve users: " + e.toString());
@@ -166,17 +442,23 @@ service /admin on new http:Listener(9093) {
         }
     }
 
-    // Get specific user details by user ID
-    resource function get users/[string userId]() returns UserTableResponse|http:NotFound|http:InternalServerError {
+    // Get specific user details by user ID (modified to handle username search)
+    resource function get users/[string userIdentifier]() returns UserTableResponse|http:NotFound|http:InternalServerError {
 
         do {
             mongodb:Collection userCollection = check myDb->getCollection("users");
             
-            // Create ObjectId for the query
-            map<json> userObjectId = {"$oid": userId};
+            // Try to find by ObjectId first, then by username
+            stream<record {|anydata...;|}, error?> userStream;
             
-            stream<record {|anydata...;|}, error?> userStream = 
-                check userCollection->find({_id: userObjectId});
+            // First try: Search by ObjectId
+            do {
+                map<json> userObjectId = {"$oid": userIdentifier};
+                userStream = check userCollection->find({_id: userObjectId});
+            } on fail {
+                // Second try: Search by username
+                userStream = check userCollection->find({username: userIdentifier});
+            }
             
             record {|anydata...;|}[] users = [];
             check userStream.forEach(function(record {|anydata...;|} user) {
@@ -190,15 +472,18 @@ service /admin on new http:Listener(9093) {
             }
 
             record {|anydata...;|} user = users[0];
-            json userIdJson = <json>user["_id"];
+            json? userIdRaw = <json?>user["_id"];
             string name = <string>(user["username"] ?: "");
             string email = <string>(user["email"] ?: "");
             string createdAt = <string>(user["createdAt"] ?: "");
 
+            // Create a dummy _id if missing (using username as identifier)
+            json userIdJson = userIdRaw ?: name;
+
             // Get counts for this user
-            int linkCount = check self.getUserLinkCount(userIdJson);
-            int categoryCount = check self.getUserCategoryCount(userIdJson);
-            string lastUpdated = check self.getUserLastUpdated(userIdJson);
+            int linkCount = check self.getUserLinkCount(userIdRaw, name);
+            int categoryCount = check self.getUserCategoryCount(userIdRaw, name);
+            string lastUpdated = check self.getUserLastUpdated(userIdRaw, name);
 
             UserTableResponse userDetail = {
                 _id: userIdJson,
@@ -215,197 +500,6 @@ service /admin on new http:Listener(9093) {
             log:printError("Failed to retrieve user details: " + e.toString());
             return <http:InternalServerError>{
                 body: {"message": "Failed to retrieve user details: " + e.toString()}
-            };
-        }
-    }
-
-    // Get user's links by user ID
-    resource function get users/[string userId]/links() returns json[]|http:InternalServerError {
-
-        do {
-            mongodb:Collection linkCollection = check myDb->getCollection("links");
-            map<json> userObjectId = {"$oid": userId};
-            
-            stream<record {|anydata...;|}, error?> linkStream = 
-                check linkCollection->find({userId: userObjectId});
-            
-            json[] links = [];
-            check linkStream.forEach(function(record {|anydata...;|} link) {
-                links.push(<json>link.cloneReadOnly());
-            });
-
-            return links;
-        } on fail var e {
-            log:printError("Failed to retrieve user links: " + e.toString());
-            return <http:InternalServerError>{
-                body: {"message": "Failed to retrieve user links: " + e.toString()}
-            };
-        }
-    }
-
-    // Get user's categories by user ID
-    resource function get users/[string userId]/categories() returns json[]|http:InternalServerError {
-
-        do {
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-            map<json> userObjectId = {"$oid": userId};
-            
-            stream<record {|anydata...;|}, error?> categoryStream = 
-                check categoryCollection->find({userId: userObjectId});
-            
-            json[] categories = [];
-            check categoryStream.forEach(function(record {|anydata...;|} category) {
-                categories.push(<json>category.cloneReadOnly());
-            });
-
-            return categories;
-        } on fail var e {
-            log:printError("Failed to retrieve user categories: " + e.toString());
-            return <http:InternalServerError>{
-                body: {"message": "Failed to retrieve user categories: " + e.toString()}
-            };
-        }
-    }
-
-    // Get admin dashboard statistics
-    resource function get stats() returns AdminStats|http:InternalServerError {
-
-        do {
-            mongodb:Collection userCollection = check myDb->getCollection("users");
-            mongodb:Collection linkCollection = check myDb->getCollection("links");
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-
-            // Get total counts
-            int totalUsers = check userCollection->countDocuments({});
-            int totalLinks = check linkCollection->countDocuments({});
-            int totalCategories = check categoryCollection->countDocuments({});
-            
-            // Get verified/unverified user counts
-            int verifiedUsers = check userCollection->countDocuments({isEmailVerified: true});
-            int unverifiedUsers = check userCollection->countDocuments({isEmailVerified: false});
-
-            AdminStats stats = {
-                totalUsers: totalUsers,
-                totalLinks: totalLinks,
-                totalCategories: totalCategories,
-                verifiedUsers: verifiedUsers,
-                unverifiedUsers: unverifiedUsers,
-                generatedAt: time:utcToString(time:utcNow())
-            };
-
-            return stats;
-        } on fail var e {
-            log:printError("Failed to retrieve admin statistics: " + e.toString());
-            return <http:InternalServerError>{
-                body: {"message": "Failed to retrieve statistics: " + e.toString()}
-            };
-        }
-    }
-
-    // Delete user and all associated data
-    resource function delete users/[string userId]() returns json|http:NotFound|http:InternalServerError {
-
-        do {
-            mongodb:Collection userCollection = check myDb->getCollection("users");
-            mongodb:Collection linkCollection = check myDb->getCollection("links");
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-            
-            map<json> userObjectId = {"$oid": userId};
-
-            // Check if user exists
-            stream<record {|anydata...;|}, error?> userStream = 
-                check userCollection->find({_id: userObjectId});
-            
-            record {|anydata...;|}[] users = [];
-            check userStream.forEach(function(record {|anydata...;|} user) {
-                users.push(user);
-            });
-
-            if users.length() == 0 {
-                return <http:NotFound>{
-                    body: {"message": "User not found"}
-                };
-            }
-
-            // Delete user's links
-            mongodb:DeleteResult linkDeleteResult = check linkCollection->deleteMany({userId: userObjectId});
-            
-            // Delete user's categories
-            mongodb:DeleteResult categoryDeleteResult = check categoryCollection->deleteMany({userId: userObjectId});
-            
-            // Delete the user
-            mongodb:DeleteResult userDeleteResult = check userCollection->deleteOne({_id: userObjectId});
-
-            return {
-                "message": "User and all associated data deleted successfully",
-                "deletedUser": userDeleteResult.deletedCount,
-                "deletedLinks": linkDeleteResult.deletedCount,
-                "deletedCategories": categoryDeleteResult.deletedCount
-            };
-        } on fail var e {
-            log:printError("Failed to delete user: " + e.toString());
-            return <http:InternalServerError>{
-                body: {"message": "Failed to delete user: " + e.toString()}
-            };
-        }
-    }
-
-    // Update user role (promote/demote admin)
-    resource function put users/[string userId]/role(@http:Payload json roleData) 
-            returns json|http:BadRequest|http:NotFound|http:InternalServerError {
-
-        do {
-            map<json> requestData = <map<json>>roleData;
-            string? newRole = <string?>requestData["role"];
-            
-            if newRole is () || (newRole != "admin" && newRole != "user") {
-                return <http:BadRequest>{
-                    body: {"message": "Invalid role. Must be 'admin' or 'user'"}
-                };
-            }
-
-            mongodb:Collection userCollection = check myDb->getCollection("users");
-            map<json> userObjectId = {"$oid": userId};
-
-            // Check if user exists
-            stream<record {|anydata...;|}, error?> userStream = 
-                check userCollection->find({_id: userObjectId});
-            
-            record {|anydata...;|}[] users = [];
-            check userStream.forEach(function(record {|anydata...;|} user) {
-                users.push(user);
-            });
-
-            if users.length() == 0 {
-                return <http:NotFound>{
-                    body: {"message": "User not found"}
-                };
-            }
-
-            // Update user role
-            mongodb:Update updateOperation = {
-                set: {
-                    role: newRole
-                }
-            };
-
-            mongodb:UpdateResult updateResult = check userCollection->updateOne({_id: userObjectId}, updateOperation);
-
-            if updateResult.modifiedCount == 0 {
-                return <http:InternalServerError>{
-                    body: {"message": "Failed to update user role"}
-                };
-            }
-
-            return {
-                "message": string `User role updated to ${newRole} successfully`,
-                "userId": userId,
-                "newRole": newRole
-            };
-        } on fail var e {
-            log:printError("Failed to update user role: " + e.toString());
-            return <http:InternalServerError>{
-                body: {"message": "Failed to update user role: " + e.toString()}
             };
         }
     }

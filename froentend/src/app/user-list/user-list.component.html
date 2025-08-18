@@ -1,36 +1,40 @@
-<div class="container">
-    <h2>Users List</h2>
-    <div *ngIf="loading" class="alert alert-info">
-        Loading users...
-    </div>
-    <div *ngIf="errorMessage" class="alert alert-danger">
-        {{ errorMessage }}
-    </div>
+<app-header></app-header>
 
-    <div *ngIf="!loading && !errorMessage">
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>Lists</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Created At</th>
-                    <th>Links Count</th>
-                    <th>Category Count</th>
-                    <th>Last Updated</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of users; let i = index">
-                    <td><span class="row-number">{{ i + 1 }}</span></td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.createdAt | date:'short' }}</td>
-                    <td>{{ user.linkCount }}</td>
-                    <td>{{ user.categoryCount }}</td>
-                    <td>{{ user.lastUpdated | date:'short' }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="container">
+  <h2>User List</h2>
+
+  <div class="filters">
+    <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
+    <app-filter-bar (filterChange)="onFilter($event)"></app-filter-bar>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">Loading users...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <table *ngIf="!loading && !errorMessage" class="user-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Created At</th>
+        <th>Last Updated</th>
+        <th>Links Count</th>
+        <th>Category Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of filteredUsers; let i = index">
+        <td data-label="#"> {{ i + 1 }} </td>
+        <td data-label="Name"> {{ user.name }} </td>
+        <td data-label="Email"> {{ user.email }} </td>
+        <td data-label="Created At"> {{ user.createdAt | date: 'short' }} </td>
+        <td data-label="Last Updated"> {{ user.lastUpdated | date: 'short' }} </td>
+        <td data-label="Links Count"> {{ user.linkCount }} </td>
+        <td data-label="Category Count"> {{ user.categoryCount }} </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
+
+<app-footer></app-footer>
