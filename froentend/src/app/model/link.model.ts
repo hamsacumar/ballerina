@@ -7,6 +7,4 @@ export interface Link {
   userId?: any;
   createdAt?: string;
   updatedAt?: string;
-    hashedUrl: string;   // ✅ add this
-
 }
