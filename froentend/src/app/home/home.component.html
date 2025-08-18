@@ -14,7 +14,7 @@
     <input
       type="text"
       [(ngModel)]="searchQuery"
-      placeholder="Search..."
+      placeholder="Find something...."
       class="search-input"
       (keyup.enter)="handleSearch()"
     />
@@ -27,6 +27,7 @@
 <div *ngIf="searchError" class="search-error">{{ searchError }}</div>
 <!-- Search Results -->
 <div class="search-results-container" *ngIf="!searching && (searchLinks.length || searchCategories.length)">
+  
   
   <!-- Categories -->
   <div *ngIf="searchCategories.length" class="result-section">
@@ -58,7 +59,14 @@
   <!-- Divider with more space -->
   <div class="results-divider-large"></div> <!-- Changed class name -->
 </div>
-  
+  <!-- No Results -->
+<div 
+  *ngIf="!searching && searchQuery && !searchLinks.length && !searchCategories.length" 
+  class="no-results"
+>
+  No results found for "{{ searchQuery }}"
+</div>
+
 
   <!-- ALL LINKS SECTION (rest of your existing code remains exactly the same) -->
   <section class="category-block">
