@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body{
+    background-color: #fbfbfb;
+}
+
+body.dark-mode,
+body.dark-mode .home-container{
+  background-color: #181818 !important  ;
+}
+  
+  /* Header and Footer Dark */
+  body.dark-mode header.navbar,
+  body.dark-mode footer.footer {
+    background-color: #bafd02aa; /* Dark gray */
+  }
+
+  body.dark-mode .home-container .header1-text h1{
+    color: #bafd02aa;
+  }
+
+  body.dark-mode .home-container .header1-text p{
+    color: whitesmoke;
+  }
+  
+  
+  

@@ -1,0 +1,248 @@
+/* Main navbar container */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #529511;
+  padding: 0.8rem 1.5rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  height: 50px;
+}
+
+/* Navbar content container */
+.navbar-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* left = navbar-brand, right = navbar-actions */
+  align-items: center;
+  margin: 0;
+}
+
+/* Right side actions */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto; /* ensures it sticks to right */
+}
+
+/* Navbar brand/logo */
+.navbar-brand {
+  margin-left: 0; /* flush to the left */
+  padding-left: 0; /* remove any inner padding */
+  position: relative; /* reset if needed */
+  left: 0; /* reset offset */
+}
+
+.navbar-logo {
+  height: 70px !important;
+  width: 70px !important;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+/* Icon buttons */
+.icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s;
+}
+
+/* Logo image */
+.navbar-logo {
+  height: 36px;
+  width: 36px;
+  object-fit: contain;
+  margin-right: 10px;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* Profile Modal Styles */
+.profile-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 1001;
+  padding: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.profile-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.profile-modal-content {
+  position: absolute;
+  right: 30px;
+  top: 80px;
+  bottom: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  max-height: calc(100vh - 100px);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  z-index: 1002;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.dropdown-item.logout {
+  color: #d32f2f;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.dropdown-item.logout:hover {
+  background-color: #ffebee;
+  color: #b71c1c;
+}
+
+/* Dropdown overlay */
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+.dropdown-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Animation for dropdown items */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .links-grid {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .link-card,
+  .link-item {
+    min-width: 80px;
+    max-width: 100px;
+  }
+
+  .add-category-container.floating-position {
+    bottom: 80px;
+    right: 20px;
+  }
+
+  .profile-modal-content {
+    right: 15px;
+    bottom: 15px;
+    max-height: calc(100vh - 95px);
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-modal-overlay {
+    justify-content: center;
+  }
+
+  .profile-modal-content {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+    width: auto;
+    max-height: calc(100vh - 90px);
+  }
+  .dropdown-menu.open .dropdown-item {
+    animation: fadeIn 0.3s forwards;
+  }
+
+  .dropdown-menu.open .dropdown-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .dropdown-menu.open .dropdown-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  /* Logo image */
+  .navbar-logo {
+    height: 36px; /* Adjust to fit navbar height */
+    width: 36px; /* Keep it square */
+    object-fit: contain;
+    margin-right: 10px; /* Space between logo and app name */
+    border-radius: 4px; /* Optional: rounded corners */
+    vertical-align: middle;
+  }
+}

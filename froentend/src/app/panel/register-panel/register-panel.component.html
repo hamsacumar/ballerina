@@ -1,22 +1,71 @@
 <div class="register-container">
-  <h2>Create an Account</h2>
-  <form class="register-form">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
-    </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-    <div class="form-group">
-      <label for="confirmPassword">Confirm Password</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required>
-    </div>
-    <button type="button" (click)="onVerify()" class="verify-button">Verify</button>
-  </form>
+  <div class="register-card">
+    <h2>Create an Account</h2>
+    <form [formGroup]="registerForm" class="register-form">
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" formControlName="username">
+        <div class="error" *ngIf="username?.touched && username?.invalid">
+          <small *ngIf="username?.errors?.['required']">Username is required</small>
+          <small *ngIf="username?.errors?.['minlength']">Username must be at least 4 characters</small>
+          <small *ngIf="username?.errors?.['maxlength']">Username cannot exceed 20 characters</small>
+          <small *ngIf="username?.errors?.['pattern']">Only letters, numbers, ., _ , - allowed</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="email">
+        <div class="error" *ngIf="email?.touched && email?.invalid">
+          <small *ngIf="email?.errors?.['required']">Email is required</small>
+          <small *ngIf="email?.errors?.['email']">Enter a valid email address</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+  <label for="password">Password</label>
+  <div class="password-input-wrapper">
+    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password">
+    <span class="toggle-icon" (click)="showPassword = !showPassword">
+      <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+  <div class="error" *ngIf="password?.touched && password?.invalid">
+    <small *ngIf="password?.errors?.['required']">Password is required</small>
+    <small *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</small>
+    <small *ngIf="password?.errors?.['maxlength']">Password cannot exceed 30 characters</small>
+    <small *ngIf="password?.errors?.['pattern']">
+      Must contain 1 uppercase, 1 number, and 1 special character
+    </small>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="confirmPassword">Confirm Password</label>
+  <div class="password-input-wrapper">
+    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword">
+    <span class="toggle-icon" (click)="showConfirmPassword = !showConfirmPassword">
+      <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+  <div class="error"
+    *ngIf="confirmPassword?.touched && (confirmPassword?.invalid || registerForm.hasError('passwordsMismatch'))">
+    <small *ngIf="confirmPassword?.errors?.['required']">Confirm Password is required</small>
+    <small *ngIf="registerForm.hasError('passwordsMismatch')">Passwords do not match</small>
+  </div>
+</div>
+
+
+
+      <button type="button" (click)="onVerify()" class="verify-button" [disabled]="registerForm.invalid">
+        Verify
+      </button>
+    </form>
+
+
+    <p class="login-link">
+      Already have an account? <span (click)="navigateTo('login')">Sign In</span>
+    </p>
+  </div>
 </div>

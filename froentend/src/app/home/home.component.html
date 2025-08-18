@@ -1,0 +1,149 @@
+<app-header></app-header>
+
+<div class="home-container">
+  <!-- Header -->
+  <div class="header1-text">
+    <h1>Tab Wallet</h1>
+    <p>Build your personal link library</p>
+  </div>
+
+  <!-- Search Bar --> <div class="search-container"> 
+    <div class="search-input-container"> <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="search-input" (keyup.enter)="handleSearch()" /> <button class="search-button" (click)="handleSearch()">Search</button> </div> <button class="clear-button" *ngIf="searchQuery" (click)="clearSearch()">Clear</button> </div>
+
+<!-- Search Results -->
+<div class="search-results-container" *ngIf="!searching && (searchLinks.length || searchCategories.length)">
+  
+  <!-- Categories -->
+  <div *ngIf="searchCategories.length" class="result-section">
+    <h3>Categories</h3>
+    <div class="result-grid">
+      <button
+        *ngFor="let cat of searchCategories"
+        class="result-btn category-btn"
+        (click)="openCategory(cat)"
+      >
+        {{ cat.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div *ngIf="searchLinks.length" class="result-section">
+    <h3>Links</h3>
+    <div class="circle-grid">
+      <div *ngFor="let link of searchLinks" class="circle-link">
+        <a [href]="link.hashedUrl" target="_blank" class="circle-button">
+          <img [src]="link.icon || 'assets/default-favicon.png'" alt="icon" />
+        </a>
+        <span class="circle-text">{{ link.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="results-divider"></div>
+</div>
+
+  <!-- ALL LINKS SECTION (rest of your existing code remains exactly the same) -->
+  <section class="category-block">
+    <div class="category-header">
+      <h2>ALL</h2>
+    </div>
+   
+    <div class="links-grid">
+      <!-- Circular Link Buttons -->
+      <div *ngFor="let l of visibleLinks('all')" class="link-circle">
+        <button class="circle-link-button" (click)="window.open(decodeUrl(l.hashedUrl), '_blank')">
+          <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
+        </button>
+        <div class="link-name">{{ l.name }}</div>
+        <!-- Menu button -->
+        <button mat-icon-button [matMenuTriggerFor]="linkMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #linkMenu="matMenu">
+          <button mat-menu-item (click)="openEditLink('all', l)">Edit</button>
+          <button mat-menu-item (click)="deleteLink('all', l)">Remove</button>
+        </mat-menu>
+      </div>
+
+      <!-- Add Link Box for "ALL" -->
+      <div class="add-box" (click)="openAddLinkDialog()">
+        <div class="circle-icon">
+          <mat-icon>add</mat-icon>
+        </div>
+        <span class="button-text">Add Link</span>
+      </div>
+    </div>
+
+    <div
+      class="see-more"
+      *ngIf="visibleLinks('all').length < (linksMap['all']?.length || 0)"
+    >
+      <button mat-button (click)="seeMore('all')">See more</button>
+    </div>
+  </section>
+
+  <!-- USER CATEGORIES (rest of your existing code remains exactly the same) -->
+  <section *ngFor="let cat of categories" class="category-block">
+    <div class="category-header">
+      <h2>{{ cat.name }}</h2>
+      <button mat-icon-button [matMenuTriggerFor]="catMenu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #catMenu="matMenu">
+        <button mat-menu-item (click)="openEditCategory(cat)">Edit</button>
+        <button mat-menu-item (click)="deleteCategory(cat)">Remove</button>
+      </mat-menu>
+    </div>
+
+    <div class="links-grid">
+      <!-- Circular Link Buttons per category -->
+      <div *ngFor="let l of visibleLinks(cat._id!)" class="link-circle">
+        <button class="circle-link-button" (click)="window.open(decodeUrl(l.hashedUrl), '_blank')">
+          <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
+        </button>
+        <div class="link-name">{{ l.name }}</div>
+        <!-- Menu button -->
+        <button mat-icon-button [matMenuTriggerFor]="linkMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #linkMenu="matMenu">
+          <button mat-menu-item (click)="openEditLink(cat._id!, l)">
+            Edit
+          </button>
+          <button mat-menu-item (click)="deleteLink(cat._id!, l)">
+            Remove
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- Add Link Box under each category -->
+      <div class="add-box" (click)="openAddLinkDialog(cat)">
+        <div class="circle-icon">
+          <mat-icon>add</mat-icon>
+        </div>
+        <span class="button-text">Add Link</span>
+      </div>
+    </div>
+
+    <div
+      class="see-more"
+      *ngIf="visibleLinks(cat._id!).length < (linksMap[cat._id!]?.length || 0)"
+    >
+      <button mat-button (click)="seeMore(cat._id!)">See more</button>
+    </div>
+  </section>
+
+  <!-- Floating Add Category Box -->
+  <div class="floating-position">
+    <div class="add-box" (click)="openAddCategoryDialog()">
+      <div class="circle-icon">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="button-text">Category</span>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
