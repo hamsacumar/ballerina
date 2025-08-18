@@ -8,13 +8,13 @@ body{
 
 body.dark-mode,
 body.dark-mode .home-container{
-  background-color: #181818 !important  ;
+  background-color: #1d1b1b !important  ;
 }
   
   /* Header and Footer Dark */
   body.dark-mode header.navbar,
   body.dark-mode footer.footer {
-    background-color: #bafd02aa; /* Dark gray */
+    background-color: #5d7e02; /* Dark gray */
   }
 
   body.dark-mode .home-container .header1-text h1{
