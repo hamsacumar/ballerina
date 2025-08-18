@@ -1,12 +1,10 @@
 export interface Link {
   _id?: string;
   name: string;
-  url: string;
+  hashedUrl: string;
   icon?: string;
-  categoryId: string;
+  categoryId?: string | null;
   userId?: any;
   createdAt?: string;
   updatedAt?: string;
-    hashedUrl: string;   // ✅ add this
-
 }

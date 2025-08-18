@@ -1,4 +1,3 @@
-import ballerina/crypto;
 import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
@@ -80,7 +79,6 @@ public type JWTPayload record {|
     }
 }
 
-
 service /api on new http:Listener(9094) {
     private final http:ListenerJwtAuthHandler jwtHandler;
 
@@ -136,7 +134,7 @@ service /api on new http:Listener(9094) {
     private function createObjectId(string id) returns map<json> {
         return {"$oid": id};
     }
- 
+
     // =========== Utility function to extract ObjectId string from json ===========
     private function extractObjectId(json id) returns string? {
         if id is map<json> && id["$oid"] is string {
@@ -146,9 +144,10 @@ service /api on new http:Listener(9094) {
     }
 
     // ========= Hash url function ===========
-    private function hashUrl(string url) returns string|error {
-        byte[] hashedBytes = crypto:hashSha256(url.toBytes());
-        return hashedBytes.toBase64();
+    private function encodeUrl(string url) returns string|error {
+        // Use base64 encoding instead of SHA256 hash so it can be decoded
+        byte[] urlBytes = url.toBytes();
+        return urlBytes.toBase64();
     }
 
     // ====== Null check  =========
@@ -214,7 +213,7 @@ service /api on new http:Listener(9094) {
     // =============== CATEGORY CRUD OPERATIONS ===============
 
     //category create - post function 
-        resource function post categories(@http:Header string Authorization, CategoryRequest categoryData)
+    resource function post categories(@http:Header string Authorization, CategoryRequest categoryData)
             returns json|http:BadRequest|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
         map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
@@ -256,7 +255,7 @@ service /api on new http:Listener(9094) {
                 string updatedAt;
             |} newCategory = {
                 name: categoryData.name.trim(),
-                userId: userId, 
+                userId: userId,
                 links: [],
                 createdAt: time:utcToString(time:utcNow()),
                 updatedAt: time:utcToString(time:utcNow())
@@ -432,13 +431,16 @@ service /api on new http:Listener(9094) {
             }
 
             // Hash the URL for security
-            string hashedUrl = check self.hashUrl(cleanUrl);
+            string hashedUrl = check self.encodeUrl(cleanUrl);
 
             // Handle optional category
+            // Handle optional category
             map<json>? categoryObjectId = ();
-            if (linkData?.categoryId is string) {
-                string categoryId = <string>linkData?.categoryId;
-                categoryObjectId = self.createObjectId(categoryId);
+            string? categoryIdFromRequest = linkData?.categoryId;
+
+            if (categoryIdFromRequest is string && categoryIdFromRequest.trim().length() > 0) {
+                // Only process if categoryId is provided and not empty
+                categoryObjectId = self.createObjectId(categoryIdFromRequest);
 
                 // Verify category exists and belongs to user
                 stream<record {|anydata...;|}, error?> categoryStream =
@@ -698,9 +700,8 @@ service /api on new http:Listener(9094) {
         return false;
     }
 
-
     // ======= Update link function =======
-    
+
     resource function put links/[string linkId](@http:Header string Authorization, LinkUpdate updateData)
     returns json|http:BadRequest|http:NotFound|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
@@ -770,7 +771,7 @@ service /api on new http:Listener(9094) {
                 }
 
                 // Hash the new URL for security
-                string hashedUrl = check self.hashUrl(cleanUrl);
+                string hashedUrl = check self.encodeUrl(cleanUrl);
                 updateFields["hashedUrl"] = hashedUrl;
                 updateFields["icon"] = self.generateFaviconUrl(cleanUrl);
             }
