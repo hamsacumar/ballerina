@@ -32,12 +32,12 @@ export class LinkService {
     return this.http.post(this.apiUrl, payload);
   }
 
-  /** Update an existing link (ALWAYS sends categoryId, even if null) */
+  /** Update an existing link */
   update(id: string, data: { name: string; url: string; categoryId?: string | null }): Observable<any> {
     const payload = {
       name: data.name,
       url: data.url,
-      categoryId: data.categoryId ?? null // Explicitly send null if undefined
+      categoryId: data.categoryId ?? null
     };
     return this.http.put(`${this.apiUrl}/${id}`, payload);
   }
@@ -46,4 +46,5 @@ export class LinkService {
   remove(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
 }
