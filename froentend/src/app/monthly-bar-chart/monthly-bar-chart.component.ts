@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 // Import Header & Footer
 import { HeaderComponent } from '../shared/header/header.component';
 import { FooterComponent } from '../shared/footer/footer.component';
+import { from } from 'rxjs';
 
 Chart.register(...registerables);
 
