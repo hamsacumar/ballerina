@@ -298,3 +298,68 @@ body.dark-mode input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px #3a3a3a inset !important;
   -webkit-text-fill-color: #f5f5f5 !important;
 }
+
+
+
+
+/* ==================== Profile Section Dark Mode ==================== */
+body.dark-mode .profile-container {
+  background-color: #232222; /* main background */
+  color: #ffffff; /* default text */
+  border: 1px solid #444; /* subtle border */
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* Profile Header (Name / Title) */
+body.dark-mode .profile-header h2,
+body.dark-mode .profile-header h3 {
+  color: #5d7e02; /* green accent for titles */
+}
+
+/* Profile picture */
+body.dark-mode .profile-avatar {
+  border: 2px solid #5d7e02;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* Profile info text */
+body.dark-mode .profile-info p,
+body.dark-mode .profile-info span {
+  color: #ffffff;
+}
+
+/* Buttons inside profile (edit, logout, etc.) */
+body.dark-mode .profile-actions .mat-mdc-button {
+  background-color: #5d7e02;
+  color: #ffffff;
+}
+
+body.dark-mode .profile-actions .mat-mdc-button:hover {
+  background-color: #5d7e02;
+}
+
+/* If you have list of settings/preferences */
+body.dark-mode .profile-settings {
+  background-color: #2e2e2e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+body.dark-mode .profile-settings .setting-item {
+  border-bottom: 1px solid #333;
+  padding: 10px 0;
+  color: #f5f5f5;
+}
+
+body.dark-mode .profile-settings .setting-item:last-child {
+  border-bottom: none;
+}
+
+/* Divider */
+body.dark-mode .profile-divider {
+  background-color: #444;
+  height: 1px;
+  margin: 1rem 0;
+}

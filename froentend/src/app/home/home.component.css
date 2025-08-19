@@ -26,7 +26,7 @@
 
 /* ==================== Category Section ==================== */
 .category-block {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #ddd !important;
   padding-bottom: 1rem;
   margin-bottom: 2rem;
 }
@@ -110,12 +110,12 @@
   right: 0;
   width: 24px;
   height: 24px;
-  opacity: 0;
-  transition: opacity 0.2s;
+  opacity: 0; 
+  transition: opacity 0.1s;
 }
 
 .link-circle:hover button[mat-icon-button] {
-  opacity: 1;
+  opacity: 2;
  
 }
 
@@ -127,9 +127,10 @@
 /* ==================== See More Button ==================== */
 /* ==================== See More Button ==================== */
 .see-more {
-  text-align: left; 
-  padding-top: 15px;  
-  padding-left: 25px;     /* Aligns the button to the left */
+  text-align: center; 
+  padding-top: 20px;  
+  padding-bottom: 20px;
+     
 }
 
 .see-more button {

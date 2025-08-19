@@ -110,7 +110,7 @@
   </section>
 
   <!-- USER CATEGORIES (rest of your existing code remains exactly the same) -->
-  <div *ngFor="let cat of categories" class="category-section" [id]="getId(cat._id)">
+  <div *ngFor="let cat of categories" class="category-section category-block" [id]="getId(cat._id)">
     <div class="category-header">
       <h2>{{ cat.name }}</h2>
       <button mat-icon-button [matMenuTriggerFor]="catMenu">
