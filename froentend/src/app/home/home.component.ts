@@ -53,14 +53,13 @@ export class HomeComponent implements OnInit {
   window = window;
   categoryIds: string[] = []; // Store IDs from printCategoryIds
 
-
   constructor(
     private dialog: MatDialog,
     private categoryService: CategoryService,
     private linkService: LinkService,
     private authService: AuthService,
     private searchService: SearchService
-  ) { }
+  ) {}
 
   // ====================== LIFECYCLE ======================
 
@@ -81,7 +80,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to fetch category IDs from service:', err);
-      }
+      },
     });
 
     this.categoryService.getAll().subscribe({
@@ -91,13 +90,11 @@ export class HomeComponent implements OnInit {
         // Now get all IDs
         this.categoryService.getAllIds().subscribe({
           next: (ids: string[]) => console.log('All category IDs:', ids),
-          error: (err) => console.error('Failed to fetch IDs:', err)
+          error: (err) => console.error('Failed to fetch IDs:', err),
         });
       },
-      error: (err) => console.error('Failed to fetch categories:', err)
+      error: (err) => console.error('Failed to fetch categories:', err),
     });
-
-
 
     this.authService.getProfile().subscribe({
       next: (profile) => console.log('User Profile:', profile),
@@ -111,9 +108,7 @@ export class HomeComponent implements OnInit {
       console.log('Fetched categories:', this.categories);
     });
   }
-  
 
-  
   printCategoryIds() {
     console.log('Fetching category IDs...');
 
@@ -124,7 +119,7 @@ export class HomeComponent implements OnInit {
         this.categoryIds = ids;
 
         // Load links for each category
-        this.categoryIds.forEach(id => {
+        this.categoryIds.forEach((id) => {
           if (id) {
             console.log('Loading links for category:', id);
             this.loadLinks(id);
@@ -133,14 +128,9 @@ export class HomeComponent implements OnInit {
           }
         });
       },
-      error: (err) => console.error('Error fetching category IDs:', err)
+      error: (err) => console.error('Error fetching category IDs:', err),
     });
   }
-
-
-
-
-
 
   loadLinks(categoryId: string) {
     console.log(`Loading links for category: ${categoryId}`);
@@ -154,16 +144,16 @@ export class HomeComponent implements OnInit {
     fetch$.subscribe({
       next: (links: any[]) => {
         console.log(`Links fetched for ${categoryId}:`, links);
-        this.linksMap[categoryId] = links.map(link => ({
+        this.linksMap[categoryId] = links.map((link) => ({
           ...link,
           _id: (link._id as any)?.$oid || link._id,
-          categoryId: (link.categoryId as any)?.$oid || link.categoryId
+          categoryId: (link.categoryId as any)?.$oid || link.categoryId,
         }));
         this.loading.links[categoryId] = false;
       },
       error: (err) => {
         console.error(`Failed to load links for category ${categoryId}:`, err);
-      }
+      },
     });
   }
 
@@ -174,14 +164,17 @@ export class HomeComponent implements OnInit {
     this.categoryService.getAll().subscribe({
       next: (cats: any[]) => {
         console.log('Categories fetched:', cats);
-        this.categories = cats.map(cat => ({
+        this.categories = cats.map((cat) => ({
           ...cat,
           _id: (cat._id as any)?.$oid || cat._id,
-          userId: (cat.userId as any)?.$oid || cat.userId
+          userId: (cat.userId as any)?.$oid || cat.userId,
         }));
 
-        console.log('Starting to load links for category IDs:', this.categoryIds);
-        this.categoryIds.forEach(catId => {
+        console.log(
+          'Starting to load links for category IDs:',
+          this.categoryIds
+        );
+        this.categoryIds.forEach((catId) => {
           this.visibleCount[catId] = 6;
           if (catId) {
             this.loadLinks(catId);
@@ -201,10 +194,6 @@ export class HomeComponent implements OnInit {
     this.loadAllLinks();
   }
 
-
-
-
-
   // ====================== SEARCH METHODS ======================
   handleSearch() {
     if (!this.searchQuery.trim()) return;
@@ -216,16 +205,16 @@ export class HomeComponent implements OnInit {
 
     this.searchService.search(this.searchQuery).subscribe({
       next: (res) => {
-        this.searchLinks = res.links.map(link => ({
+        this.searchLinks = res.links.map((link) => ({
           ...link,
           _id: (link._id as any)?.$oid || link._id,
-          categoryId: (link.categoryId as any)?.$oid || link.categoryId
+          categoryId: (link.categoryId as any)?.$oid || link.categoryId,
         }));
 
-        this.searchCategories = res.categories.map(cat => ({
+        this.searchCategories = res.categories.map((cat) => ({
           ...cat,
           _id: (cat._id as any)?.$oid || cat._id,
-          userId: (cat.userId as any)?.$oid || cat.userId
+          userId: (cat.userId as any)?.$oid || cat.userId,
         }));
 
         this.searching = false;
@@ -233,7 +222,7 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         this.searchError = err?.error?.message || 'Search failed';
         this.searching = false;
-      }
+      },
     });
   }
 
@@ -253,9 +242,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
   // ====================== CATEGORY METHODS ======================
-
 
   openAddCategoryDialog() {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
@@ -291,14 +278,15 @@ export class HomeComponent implements OnInit {
           return;
         }
 
-        this.categoryService.update(categoryId, { name: result.name }).subscribe({
-          next: () => this.loadCategories(),
-          error: (err) => console.error('Failed to update category:', err),
-        });
+        this.categoryService
+          .update(categoryId, { name: result.name })
+          .subscribe({
+            next: () => this.loadCategories(),
+            error: (err) => console.error('Failed to update category:', err),
+          });
       }
     });
   }
-
 
   deleteCategory(cat: Category) {
     const categoryId = this.getId(cat._id);
@@ -307,10 +295,12 @@ export class HomeComponent implements OnInit {
     if (confirm(`Delete category "${cat.name}" and all its links?`)) {
       this.categoryService.remove(categoryId).subscribe({
         next: () => {
-          this.categories = this.categories.filter(c => ((c._id as any)?.$oid || c._id) !== categoryId);
+          this.categories = this.categories.filter(
+            (c) => ((c._id as any)?.$oid || c._id) !== categoryId
+          );
           this.loadAllLinks();
         },
-        error: (err) => console.error('Failed to delete category:', err)
+        error: (err) => console.error('Failed to delete category:', err),
       });
     }
   }
@@ -319,18 +309,19 @@ export class HomeComponent implements OnInit {
   loadAllLinks() {
     this.linkService.getAll().subscribe({
       next: (res: any) => {
-        const allLinks = [...(res.categorizedLinks || []), ...(res.uncategorizedLinks || [])];
-        this.linksMap['all'] = allLinks.map(link => ({
+        const allLinks = [
+          ...(res.categorizedLinks || []),
+          ...(res.uncategorizedLinks || []),
+        ];
+        this.linksMap['all'] = allLinks.map((link) => ({
           ...link,
           _id: (link._id as any)?.$oid || link._id,
-          categoryId: (link.categoryId as any)?.$oid || link.categoryId
+          categoryId: (link.categoryId as any)?.$oid || link.categoryId,
         }));
       },
-      error: (err) => console.error('Failed to load all links:', err)
+      error: (err) => console.error('Failed to load all links:', err),
     });
   }
-
-
 
   visibleLinks(categoryId: string): Link[] {
     const allLinks = Array.isArray(this.linksMap[categoryId])

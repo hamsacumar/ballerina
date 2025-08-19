@@ -45,13 +45,14 @@ body.dark-mode .link-name {
 /* ==================== Circular Link Buttons ==================== */
 body.dark-mode .circle-link-button {
   background-color: #272626;
-  border: 1px solid #1d1c1c;
+  border: 1px solid #393a38;
+    box-shadow: 0 4px 12px #0d0e0d;
   
 }
 
 body.dark-mode .circle-link-button:hover {
   border-color: #131413;
-  box-shadow: 0 4px 12px rgba(1, 1, 1, 0.3);
+  box-shadow: 0 4px 12px #5d7e02;
 }
 
 body.dark-mode .circle-link-button img {
@@ -299,67 +300,267 @@ body.dark-mode input:-webkit-autofill:active {
   -webkit-text-fill-color: #f5f5f5 !important;
 }
 
-
-
-
-/* ==================== Profile Section Dark Mode ==================== */
+/* ==================== Profile Modal Dark Mode ==================== */
 body.dark-mode .profile-container {
-  background-color: #232222; /* main background */
-  color: #ffffff; /* default text */
-  border: 1px solid #444; /* subtle border */
+  background-color: #232222 !important;
+  color: #ffffff !important; /* white text for dark mode */
+  border: 1px solid #444;
   border-radius: 8px;
   padding: 20px;
 }
 
-/* Profile Header (Name / Title) */
-body.dark-mode .profile-header h2,
-body.dark-mode .profile-header h3 {
-  color: #5d7e02; /* green accent for titles */
+/* Profile Header */
+body.dark-mode .profile-header h2 {
+  color: #5d7e02 !important; /* keep green accent for "My Profile" title */
 }
 
-/* Profile picture */
-body.dark-mode .profile-avatar {
-  border: 2px solid #5d7e02;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+/* Profile Image Section */
+body.dark-mode .profile-image-section {
+  background-color: #232222 !important;
 }
 
-/* Profile info text */
-body.dark-mode .profile-info p,
-body.dark-mode .profile-info span {
-  color: #ffffff;
+body.dark-mode .image-container {
+  background-color: #232222 !important;
 }
 
-/* Buttons inside profile (edit, logout, etc.) */
-body.dark-mode .profile-actions .mat-mdc-button {
-  background-color: #5d7e02;
-  color: #ffffff;
+body.dark-mode .profile-image-placeholder {
+  background-color: #5d7e02 !important; /* green background for profile circle */
+  color: #ffffff !important; /* white text for "Profile Picture" */
 }
 
-body.dark-mode .profile-actions .mat-mdc-button:hover {
-  background-color: #5d7e02;
+body.dark-mode .image-overlay {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
 }
 
-/* If you have list of settings/preferences */
-body.dark-mode .profile-settings {
-  background-color: #2e2e2e;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 15px;
+/* User Information Section */
+body.dark-mode .user-info-section {
+  background-color: #232222 !important;
 }
 
-body.dark-mode .profile-settings .setting-item {
-  border-bottom: 1px solid #333;
-  padding: 10px 0;
-  color: #f5f5f5;
+body.dark-mode .info-item {
+  background-color: #232222 !important;
+  border-bottom: 1px solid #444;
 }
 
-body.dark-mode .profile-settings .setting-item:last-child {
-  border-bottom: none;
+body.dark-mode .info-label {
+  color: #ffffff !important; /* white text for labels */
+  font-weight: 600;
 }
 
-/* Divider */
-body.dark-mode .profile-divider {
-  background-color: #444;
-  height: 1px;
-  margin: 1rem 0;
+body.dark-mode .info-content {
+  background-color: #232222 !important;
+}
+
+body.dark-mode .info-display {
+  background-color: #232222 !important;
+}
+
+body.dark-mode .info-value {
+  color: #ffffff !important; /* white text for values */
+}
+
+/* Email Verified Badge */
+body.dark-mode .email-verified {
+  color: #5d7e02 !important; /* green for verified checkmark */
+}
+
+/* Edit Buttons - Changed to dark style with green text */
+body.dark-mode .edit-btn {
+  background-color: #2e2e2e !important; /* dark background */
+  color: #5d7e02 !important; /* green text */
+  border: 1px solid #5d7e02 !important; /* green border */
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+body.dark-mode .edit-btn:hover {
+  background-color: #3a3a3a !important; /* slightly lighter dark on hover */
+  color: #7ca902 !important; /* lighter green text on hover */
+}
+
+/* Form Inputs */
+body.dark-mode .form-input {
+  background-color: #2e2e2e !important; /* dark background for inputs */
+  color: #ffffff !important; /* white text in inputs */
+  border: 1px solid #444 !important;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+body.dark-mode .form-input::placeholder {
+  color: #888 !important; /* light gray placeholder */
+}
+
+body.dark-mode .form-input:focus {
+  border-color: #5d7e02 !important; /* green focus border */
+  box-shadow: 0 0 0 2px rgba(93, 126, 2, 0.2) !important;
+}
+
+body.dark-mode .form-input.error {
+  border-color: #ff5c5c !important;
+}
+
+/* Input Groups */
+body.dark-mode .input-group {
+  background-color: #232222 !important;
+}
+
+/* Password Toggle Buttons */
+body.dark-mode .password-toggle {
+  background-color: transparent !important;
+  color: #ffffff !important; /* white icons */
+  border: none !important;
+}
+
+body.dark-mode .password-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .password-toggle svg {
+  stroke: #ffffff !important; /* white SVG icons */
+}
+
+/* Password Fields Container */
+body.dark-mode .password-fields {
+  background-color: #232222 !important;
+}
+
+/* Form Actions */
+body.dark-mode .form-actions {
+  background-color: #232222 !important;
+  padding-top: 15px;
+}
+
+/* Cancel Buttons - Changed to dark style with green text */
+body.dark-mode .cancel-btn {
+  background-color: #2e2e2e !important; /* dark background */
+  color: #5d7e02 !important; /* green text */
+  border: 1px solid #5d7e02 !important; /* green border */
+  border-radius: 4px;
+  padding: 10px 20px;
+}
+
+body.dark-mode .cancel-btn:hover {
+  background-color: #3a3a3a !important; /* slightly lighter dark on hover */
+  color: #7ca902 !important; /* lighter green text on hover */
+}
+
+/* Update Buttons */
+body.dark-mode .update-btn {
+  background-color: #5d7e02 !important; /* keep green for primary actions */
+  color: #ffffff !important; /* white text on green */
+  border: none !important;
+  border-radius: 4px;
+  padding: 10px 20px;
+}
+
+body.dark-mode .update-btn:hover:not(:disabled) {
+  background-color: #7ca902 !important; /* lighter green on hover */
+}
+
+body.dark-mode .update-btn:disabled {
+  background-color: #555 !important;
+  color: #888 !important;
+  opacity: 0.6;
+}
+
+body.dark-mode .update-btn.loading {
+  opacity: 0.8;
+}
+
+/* Logout Button */
+body.dark-mode .logout-btn {
+  background-color: #ff5c5c !important; /* red background */
+  color: #ffffff !important; /* white text */
+  border: none !important;
+  border-radius: 4px;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+body.dark-mode .logout-btn:hover {
+  background-color: #ff4444 !important; /* darker red on hover */
+}
+
+body.dark-mode .logout-section {
+  border-bottom: none !important;
+  padding-top: 20px;
+}
+
+/* Validation Errors */
+body.dark-mode .validation-error {
+  color: #ff5c5c !important; /* red error text */
+  background-color: #232222 !important;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+body.dark-mode .validation-errors {
+  background-color: #232222 !important;
+}
+
+/* Success and Error Messages */
+body.dark-mode .success-message {
+  color: #5d7e02 !important; /* green success text */
+  background-color: #232222 !important;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+body.dark-mode .error-message {
+  color: #ff5c5c !important; /* red error text */
+  background-color: #232222 !important;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+body.dark-mode .loading-message {
+  color: #ffffff !important; /* white loading text */
+  background-color: #232222 !important;
+  font-size: 14px;
+}
+
+/* Success Popup Overlay */
+body.dark-mode .success-popup-overlay {
+  background-color: rgba(0, 0, 0, 0.7) !important; /* darker overlay */
+}
+
+/* Success Popup */
+body.dark-mode .success-popup {
+  background-color: #232222 !important;
+  border: 1px solid #444 !important;
+  border-radius: 8px;
+}
+
+body.dark-mode .success-popup-content {
+  background-color: #232222 !important;
+  color: #ffffff !important; /* white text */
+  padding: 20px;
+}
+
+body.dark-mode .success-popup-title {
+  color: #5d7e02 !important; /* green title */
+}
+
+body.dark-mode .success-popup-message {
+  color: #ffffff !important; /* white message text */
+}
+
+body.dark-mode .success-popup-close {
+  background-color: #5d7e02 !important; /* green background */
+  color: #ffffff !important; /* white text */
+  border: none !important;
+  border-radius: 4px;
+  padding: 8px 16px;
+}
+
+body.dark-mode .success-popup-close:hover {
+  background-color: #7ca902 !important; /* lighter green on hover */
+}
+
+body.dark-mode .success-popup-icon {
+  font-size: 24px;
 }

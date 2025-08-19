@@ -20,18 +20,14 @@ export interface LoginResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
-
-
 export class AuthService {
-
   private api = environment.authApi;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-   register(data: RegisterRequest): Observable<any> {
+  register(data: RegisterRequest): Observable<any> {
     return this.http.post(`${this.api}/register`, data);
   }
 
@@ -52,17 +48,19 @@ export class AuthService {
     return this.http.post(`${this.api}/forgotpassword`, data);
   }
 
-  resetPassword(data: { email: string, resetCode: string, newPassword: string }): Observable<any> {
+  resetPassword(data: {
+    email: string;
+    resetCode: string;
+    newPassword: string;
+  }): Observable<any> {
     return this.http.post(`${this.api}/resetpassword`, {
       email: data.email,
       resetCode: data.resetCode,
-      newPassword: data.newPassword
+      newPassword: data.newPassword,
     });
   }
 
   logout(): Observable<any> {
     return this.http.post(`${this.api}/logout`, {});
   }
-  
-
 }

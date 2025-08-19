@@ -4,8 +4,8 @@
   max-width: 900px;
   margin: 50px auto;
   padding: 2rem;
-  text-align: center; 
-  font-family: 'Arial', sans-serif;
+  text-align: center;
+  font-family: "Arial", sans-serif;
   position: relative;
   min-height: 70vh;
 }
@@ -73,7 +73,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 8px;
@@ -81,7 +81,7 @@
 
 .circle-link-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: #529511;
 }
 
@@ -110,13 +110,12 @@
   right: 0;
   width: 24px;
   height: 24px;
-  opacity: 0; 
+  opacity: 0;
   transition: opacity 0.1s;
 }
 
 .link-circle:hover button[mat-icon-button] {
   opacity: 2;
- 
 }
 
 .link-circle button[mat-icon-button] mat-icon {
@@ -125,12 +124,10 @@
 }
 
 /* ==================== See More Button ==================== */
-/* ==================== See More Button ==================== */
 .see-more {
-  text-align: center; 
-  padding-top: 20px;  
+  text-align: center;
+  padding-top: 20px;
   padding-bottom: 20px;
-     
 }
 
 .see-more button {
@@ -138,11 +135,11 @@
   color: #fff;
   background-color: #529511;
   border-radius: 20px;
-  padding: 1px 8px 1px upx;       /* smaller size */
-  font-size: 12px;         /* reduce text size */
+  padding: 1px 8px 1px upx; 
+  font-size: 12px; 
   cursor: pointer;
   display: inline-flex;
-  align-items: center;     /* fix alignment (not 'left') */
+  align-items: center; 
   gap: 10px;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
@@ -151,7 +148,6 @@
   background-color: #417a0d;
   transform: translateY(-2px);
 }
-
 
 /* Arrow style */
 .arrow-down {
@@ -163,7 +159,6 @@
   border-right: 6px solid transparent;
   border-top: 6px solid #fff; /* White arrow */
 }
-
 
 /* ==================== Add Box (Link & Category) ==================== */
 .add-box {
@@ -241,8 +236,6 @@
     right: 20px;
   }
 }
-
-
 
 /* ==================== Search ==================== */
 .search-container {
@@ -373,7 +366,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, background 0.2s;
 }
 
