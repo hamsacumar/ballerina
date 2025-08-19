@@ -1,0 +1,33 @@
+<app-header></app-header>
+
+<div class="head">
+  <button class="back-btn" (click)="goBack()">← Go Back</button>
+  <h1>Monthly Summary</h1>
+  <p>Visualize the monthly data for links, categories, and users.</p>
+</div>
+
+<div class="chart-filter">
+  <label for="year">Select Year: </label>
+  <input type="number" id="year" [(ngModel)]="selectedYear" />
+
+  <button class="filter-btn" (click)="applyFilter()">Filter</button>
+</div>
+
+<div class="charts-wrapper">
+  <div class="chart-container">
+    <h3>Links Count</h3>
+    <canvas id="linksChartCanvas"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Users Count</h3>
+    <canvas id="usersChartCanvas"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Categories Count</h3>
+    <canvas id="categoriesChartCanvas"></canvas>
+  </div>
+</div>
+
+<app-footer></app-footer>

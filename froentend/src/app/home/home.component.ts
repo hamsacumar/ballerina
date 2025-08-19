@@ -53,6 +53,7 @@ export class HomeComponent implements OnInit {
   window = window;
   categoryIds: string[] = []; // Store IDs from printCategoryIds
 
+  selectedLink: any;
 
   constructor(
     private dialog: MatDialog,
@@ -70,7 +71,7 @@ export class HomeComponent implements OnInit {
     this.visibleCount['uncategorized'] = 6;
 
     this.loadCategories();
-
+    this.linkService.getByCategory('68a3842a5e818329c71d1ea1');
     this.printCategoryIds();
     this.fetchCategories();
 
@@ -373,54 +374,58 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  openEditLink(catId: string, link: Link) {
+  openEditLink(link: Link) {
+    console.log('Editing link:', link); 
+    console.log('Link ID:', link._id);
+    const linkId = (link as any)._id || (link as any).id;  // fallback check
+    console.log('Link ID:', linkId);
     const originalUrl = this.decodeUrl(link.hashedUrl);
     const dialogRef = this.dialog.open(AddLinkDialogComponent, {
       width: '400px',
       data: {
         mode: 'edit',
-        id: link._id,
+        id: linkId,
         name: link.name,
         url: originalUrl,
-        categoryId: catId,
       },
     });
-
+  
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        const payload: any = {
+        const payload = {
           name: result.name,
           url: result.url,
-          categoryId: result.categoryId ?? null, // ✅ always send categoryId
         };
-
-        this.linkService.update(link._id!, payload).subscribe({
+  
+        this.linkService.update(linkId, payload).subscribe({
           next: () => {
             this.loadAllLinks();
-            if (result.categoryId) this.loadLinks(result.categoryId); // new category
-            if (catId !== result.categoryId) this.loadLinks(catId); // old category
           },
           error: (err) => console.error('Failed to update link:', err),
         });
       }
     });
   }
+  
 
   deleteLink(catId: string, link: Link) {
     const linkId = (link._id as any)?.$oid || link._id;
     if (!linkId) return console.error('Missing link ID');
-
-    if (confirm(`Delete link "${link.name}"?`)) {
-      this.linkService.remove(linkId).subscribe({
-        next: () => {
-          this.loadAllLinks();
-          this.loadLinks(catId);
-        },
-        error: (err) => console.error('Failed to delete link:', err),
-      });
-    }
+  
+    if (!confirm(`Delete link "${link.name}"?`)) return;
+  
+    this.linkService.remove(linkId).subscribe({
+      next: () => {
+        console.log(`Link ${link.name} deleted`);
+        this.loadLinks(catId); // pick only one reload
+      },
+      error: (err) => console.error('Failed to delete link:', err),
+    });
   }
+  
 
+  
+  
   // Add this method to your HomeComponent class
   decodeUrl(encodedUrl: string): string {
     try {
