@@ -3,6 +3,8 @@
 <div class="container">
   <h2>User List</h2>
 
+  <a routerLink="/monthly-bar-chart" class="btn btn-primary">View Monthly Chart</a>
+
   <div class="filters">
     <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
     <app-filter-bar (filterChange)="onFilter($event)"></app-filter-bar>

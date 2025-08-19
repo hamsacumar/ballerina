@@ -72,6 +72,153 @@ service /admin on new http:Listener(9093) {
         log:printInfo("Admin service initialized successfully");
     }
 
+    // Helper function to extract YYYY-MM from createdAt timestamp
+    private function extractMonth(string createdAt) returns string {
+        // Handle different date formats: ISO string, timestamp, etc.
+        // Expected format: "2024-01-15T10:30:00Z" or "2024-01-15"
+        if createdAt.length() >= 7 {
+            // Extract first 7 characters (YYYY-MM)
+            return createdAt.substring(0, 7);
+        }
+        return "";
+    }
+
+    // Helper function to get current month in YYYY-MM format
+    private function getCurrentMonth() returns string {
+        time:Utc currentTime = time:utcNow();
+        time:Civil civilTime = time:utcToCivil(currentTime);
+        return string `${civilTime.year}-${civilTime.month < 10 ? "0" : ""}${civilTime.month}`;
+    }
+
+    // Helper function to get previous month in YYYY-MM format
+    private function getPreviousMonth() returns string {
+        time:Utc currentTime = time:utcNow();
+        time:Civil civilTime = time:utcToCivil(currentTime);
+        
+        int prevMonth = civilTime.month - 1;
+        int prevYear = civilTime.year;
+        
+        if prevMonth == 0 {
+            prevMonth = 12;
+            prevYear = prevYear - 1;
+        }
+        
+        return string `${prevYear}-${prevMonth < 10 ? "0" : ""}${prevMonth}`;
+    }
+
+    // Helper function to generate all months from start to end (inclusive)
+    private function generateMonthRange(string startMonth, string endMonth) returns string[]|error {
+        string[] months = [];
+        
+        // Parse start month
+        string:RegExp separator = re `-`;
+        string[] startParts = separator.split(startMonth);
+        string[] endParts = separator.split(endMonth);
+        
+        if startParts.length() != 2 || endParts.length() != 2 {
+            return months;
+        }
+        
+        int startYear = check int:fromString(startParts[0]);
+        int startMonthNum = check int:fromString(startParts[1]);
+        int endYear = check int:fromString(endParts[0]);
+        int endMonthNum = check int:fromString(endParts[1]);
+        
+        int currentYear = startYear;
+        int currentMonth = startMonthNum;
+        
+        while (currentYear < endYear || (currentYear == endYear && currentMonth <= endMonthNum)) {
+            string monthStr = string `${currentYear}-${currentMonth < 10 ? "0" : ""}${currentMonth}`;
+            months.push(monthStr);
+            
+            currentMonth += 1;
+            if currentMonth > 12 {
+                currentMonth = 1;
+                currentYear += 1;
+            }
+        }
+        
+        return months;
+    }
+
+    // Helper function to find the earliest user creation month
+    private function getEarliestUserMonth() returns string|error {
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+        
+        // Sort by createdAt ascending to get the earliest user
+        mongodb:FindOptions options = {
+            sort: {"createdAt": 1},
+            'limit: 1
+        };
+        
+        stream<record {|anydata...;|}, error?> userStream = check userCollection->find({}, options);
+        
+        string earliestMonth = self.getCurrentMonth(); // Default to current month
+        
+        check userStream.forEach(function(record {|anydata...;|} user) {
+            anydata createdAtRaw = user["createdAt"];
+            string createdAtStr = "";
+            
+            if createdAtRaw is string {
+                createdAtStr = createdAtRaw;
+            } else if createdAtRaw is map<anydata> {
+                anydata dateValue = createdAtRaw["$date"];
+                if dateValue is string {
+                    createdAtStr = dateValue;
+                }
+            }
+            
+            if createdAtStr != "" {
+                earliestMonth = self.extractMonth(createdAtStr);
+            }
+        });
+        
+        return earliestMonth;
+    }
+
+    // Helper function to convert YYYY-MM to readable month name
+    private function getMonthName(string monthStr) returns string {
+        string:RegExp separator = re `-`;
+        string[] parts = separator.split(monthStr);
+        if parts.length() != 2 {
+            return monthStr;
+        }
+        
+        string year = parts[0];
+        string month = parts[1];
+        
+        string monthName = "";
+        if month == "01" {
+            monthName = "January";
+        } else if month == "02" {
+            monthName = "February";
+        } else if month == "03" {
+            monthName = "March";
+        } else if month == "04" {
+            monthName = "April";
+        } else if month == "05" {
+            monthName = "May";
+        } else if month == "06" {
+            monthName = "June";
+        } else if month == "07" {
+            monthName = "July";
+        } else if month == "08" {
+            monthName = "August";
+        } else if month == "09" {
+            monthName = "September";
+        } else if month == "10" {
+            monthName = "October";
+        } else if month == "11" {
+            monthName = "November";
+        } else if month == "12" {
+            monthName = "December";
+        } else {
+            monthName = month;
+        }
+        
+        return monthName + " " + year;
+    }
+
     // FIXED: Utility function to get user's link count using username as fallback
     private function getUserLinkCount(json userId, string username) returns int|error {
         mongodb:Collection linkCollection = check myDb->getCollection("links");
@@ -330,28 +477,191 @@ service /admin on new http:Listener(9093) {
     }
 
     // Debug endpoint to check database contents
-    resource function get debug/counts() returns json|http:InternalServerError {
-        do {
-            mongodb:Collection linkCollection = check myDb->getCollection("links");
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-            mongodb:Collection userCollection = check myDb->getCollection("users");
+   // Replace your existing counts() function with this monthly counts function
+resource function get counts() returns json|http:InternalServerError {
+    do {
+        mongodb:Collection linkCollection = check myDb->getCollection("links");
+        mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+        mongodb:Collection userCollection = check myDb->getCollection("users");
 
-            int totalLinks = check linkCollection->countDocuments({});
-            int totalCategories = check categoryCollection->countDocuments({});
-            int totalUsers = check userCollection->countDocuments({});
+        // Get total counts
+        int totalLinks = check linkCollection->countDocuments({});
+        int totalCategories = check categoryCollection->countDocuments({});
+        int totalUsers = check userCollection->countDocuments({});
 
-            return {
+        return {
+            "summary": {
                 "totalUsers": totalUsers,
                 "totalLinks": totalLinks,
-                "totalCategories": totalCategories,
-                "message": "Database collection counts"
-            };
-        } on fail var e {
-            return <http:InternalServerError>{
-                body: {"message": "Failed to get counts: " + e.toString()}
-            };
-        }
+                "totalCategories": totalCategories
+            },
+            "message": "Counts retrieved successfully"
+        };
+
+    } on fail var e {
+        log:printError("Counts error: " + e.toString());
+        return <http:InternalServerError>{
+            body: {"message": "Failed to get counts: " + e.toString()}
+        };
     }
+}
+
+
+// Monthly bar chart data from first user creation to current month
+resource function get monthlyBarChart() returns json|http:InternalServerError {
+    do {
+        mongodb:Collection linkCollection = check myDb->getCollection("links");
+        mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+        mongodb:Collection userCollection = check myDb->getCollection("users");
+
+        // Find the earliest user creation month
+        string earliestMonth = check self.getEarliestUserMonth();
+        string currentMonth = self.getCurrentMonth();
+        
+        // Generate all months from earliest to current
+        string[] targetMonths = check self.generateMonthRange(earliestMonth, currentMonth);
+        
+        log:printInfo("Generating chart data from " + earliestMonth + " to " + currentMonth + " (" + targetMonths.length().toString() + " months)");
+
+        // Get all documents and process manually
+        stream<record {|anydata...;|}, error?> linksStream = check linkCollection->find({});
+        stream<record {|anydata...;|}, error?> categoriesStream = check categoryCollection->find({});
+        stream<record {|anydata...;|}, error?> usersStream = check userCollection->find({});
+
+        // Maps to store monthly counts for all months
+        map<int> linksMonthlyCount = {};
+        map<int> categoriesMonthlyCount = {};
+        map<int> usersMonthlyCount = {};
+
+        // Initialize all months with 0 counts
+        foreach string month in targetMonths {
+            linksMonthlyCount[month] = 0;
+            categoriesMonthlyCount[month] = 0;
+            usersMonthlyCount[month] = 0;
+        }
+
+        // Process links
+        check linksStream.forEach(function(record {|anydata...;|} link) {
+            anydata createdAtRaw = link["createdAt"];
+            string createdAtStr = "";
+            
+            if createdAtRaw is string {
+                createdAtStr = createdAtRaw;
+            } else if createdAtRaw is map<anydata> {
+                // Handle MongoDB date object
+                anydata dateValue = createdAtRaw["$date"];
+                if dateValue is string {
+                    createdAtStr = dateValue;
+                }
+            }
+            
+            if createdAtStr != "" {
+                string month = self.extractMonth(createdAtStr);
+                // Count for all months in our range
+                if linksMonthlyCount.hasKey(month) {
+                    linksMonthlyCount[month] = (linksMonthlyCount[month] ?: 0) + 1;
+                }
+            }
+        });
+
+        // Process categories
+        check categoriesStream.forEach(function(record {|anydata...;|} category) {
+            anydata createdAtRaw = category["createdAt"];
+            string createdAtStr = "";
+            
+            if createdAtRaw is string {
+                createdAtStr = createdAtRaw;
+            } else if createdAtRaw is map<anydata> {
+                // Handle MongoDB date object
+                anydata dateValue = createdAtRaw["$date"];
+                if dateValue is string {
+                    createdAtStr = dateValue;
+                }
+            }
+            
+            if createdAtStr != "" {
+                string month = self.extractMonth(createdAtStr);
+                // Count for all months in our range
+                if categoriesMonthlyCount.hasKey(month) {
+                    categoriesMonthlyCount[month] = (categoriesMonthlyCount[month] ?: 0) + 1;
+                }
+            }
+        });
+
+        // Process users
+        check usersStream.forEach(function(record {|anydata...;|} user) {
+            anydata createdAtRaw = user["createdAt"];
+            string createdAtStr = "";
+            
+            if createdAtRaw is string {
+                createdAtStr = createdAtRaw;
+            } else if createdAtRaw is map<anydata> {
+                // Handle MongoDB date object
+                anydata dateValue = createdAtRaw["$date"];
+                if dateValue is string {
+                    createdAtStr = dateValue;
+                }
+            }
+            
+            if createdAtStr != "" {
+                string month = self.extractMonth(createdAtStr);
+                // Count for all months in our range
+                if usersMonthlyCount.hasKey(month) {
+                    usersMonthlyCount[month] = (usersMonthlyCount[month] ?: 0) + 1;
+                }
+            }
+        });
+
+        // Create chart data for all months from earliest to current
+        json[] chartData = [];
+        foreach string month in targetMonths {
+            int linkCount = linksMonthlyCount[month] ?: 0;
+            int categoryCount = categoriesMonthlyCount[month] ?: 0;
+            int userCount = usersMonthlyCount[month] ?: 0;
+
+            json monthData = {
+                "x": self.getMonthName(month),
+                "month": month,
+                "links": linkCount,
+                "categories": categoryCount,
+                "users": userCount,
+                "total": linkCount + categoryCount + userCount,
+                "isCurrent": month == currentMonth
+            };
+            chartData.push(monthData);
+        }
+
+        return {
+            "chartData": chartData,
+            "chartConfig": {
+                "xAxisKey": "x",
+                "dataKeys": ["links", "categories", "users"],
+                "colors": {
+                    "links": "#F4A460",
+                    "categories": "#4169E1",
+                    "users": "#DC143C"
+                },
+                "labels": {
+                    "links": "Links",
+                    "categories": "Categories", 
+                    "users": "Users"
+                }
+            },
+            "summary": {
+                "totalMonths": targetMonths.length(),
+                "startMonth": self.getMonthName(earliestMonth),
+                "endMonth": self.getMonthName(currentMonth)
+            },
+            "message": "Monthly bar chart data retrieved successfully from " + self.getMonthName(earliestMonth) + " to " + self.getMonthName(currentMonth)
+        };
+
+    } on fail var e {
+        log:printError("Monthly bar chart error: " + e.toString());
+        return <http:InternalServerError>{
+            body: {"message": "Failed to get monthly bar chart data: " + e.toString()}
+        };
+    }
+}
 
     // FIXED: Get all users data with explicit _id field inclusion and username fallback
     resource function get users() returns UserTableResponse[]|http:InternalServerError {
