@@ -72,10 +72,7 @@ body.dark-mode .add-box .button-text {
   color: #f5f5f5;
 }
 
-/* ==================== Floating Add Category ==================== */
-body.dark-mode .floating-position {
-  /* keep as-is, will inherit background */
-}
+
 
 /* ==================== Search ==================== */
 body.dark-mode .search-container {
