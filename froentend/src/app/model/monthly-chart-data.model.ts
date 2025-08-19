@@ -1,10 +1,27 @@
-// monthly-chart-data.model.ts
 export interface MonthlyChartData {
-  x: string;        // Display month name (e.g., Jan 2025)
-  month: string;    // Raw month key (e.g., 2025-01)
+  year: number;
+  month: string;
+  monthNumber: number;
+  yearMonth: string;
   links: number;
   categories: number;
   users: number;
   total: number;
   isCurrent: boolean;
+}
+
+export interface ChartResponse {
+  chartData: MonthlyChartData[];
+  chartConfig: {
+    xAxisKey: string;
+    dataKeys: string[];
+    colors: { [key: string]: string };
+    labels: { [key: string]: string };
+  };
+  summary: {
+    totalMonths: number;
+    startMonth: string;
+    endMonth: string;
+  };
+  message: string;
 }

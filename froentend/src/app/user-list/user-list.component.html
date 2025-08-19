@@ -1,9 +1,11 @@
 <app-header></app-header>
 
 <div class="container">
-  <h2>User List</h2>
 
   <a routerLink="/monthly-bar-chart" class="btn btn-primary">View Monthly Chart</a>
+  <h2>USERS DETAILS</h2>
+
+  
 
   <div class="filters">
     <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
@@ -16,7 +18,7 @@
   <table *ngIf="!loading && !errorMessage" class="user-table">
     <thead>
       <tr>
-        <th>#</th>
+        <th></th>
         <th>Name</th>
         <th>Email</th>
         <th>Created At</th>
