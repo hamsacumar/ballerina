@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router'; // ✅ add this
 import { UserService } from '../service/user.service';
 import { User } from '../model/admin_user.model';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
@@ -14,6 +15,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,          // ✅ needed for routerLink
     SearchBarComponent,
     FilterBarComponent,
     HeaderComponent,
