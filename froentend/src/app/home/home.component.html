@@ -22,15 +22,14 @@
   <button class="clear-button" *ngIf="searchQuery" (click)="clearSearch()">Clear</button>
 </div>
 
-<!-- Search error -->
-<div *ngIf="searchError" class="search-error">{{ searchError }}</div>
+
 <!-- Search Results -->
 <div class="search-results-container" *ngIf="!searching && (searchLinks.length || searchCategories.length)">
   
   
   <!-- Categories -->
   <div *ngIf="searchCategories.length" class="result-section">
-    <h3 class="left-align">Categories</h3> <!-- Added left-align class -->
+    <h3 class="left-align">Found Categories</h3> <!-- Added left-align class -->
     <div class="result-grid">
       <button
         *ngFor="let cat of searchCategories"
@@ -44,7 +43,7 @@
 
   <!-- Links -->
   <div *ngIf="searchLinks.length" class="result-section">
-    <h3 class="left-align">Links</h3> <!-- Added left-align class -->
+    <h3 class="left-align">Found Links</h3> <!-- Added left-align class -->
     <div class="circle-grid">
       <div *ngFor="let link of searchLinks" class="circle-link">
         <a [href]="link.hashedUrl" target="_blank" class="circle-button">
@@ -111,7 +110,7 @@
   </section>
 
   <!-- USER CATEGORIES (rest of your existing code remains exactly the same) -->
-  <section *ngFor="let cat of categories" class="category-block">
+  <div *ngFor="let cat of categories" class="category-section" [id]="getId(cat._id)">
     <div class="category-header">
       <h2>{{ cat.name }}</h2>
       <button mat-icon-button [matMenuTriggerFor]="catMenu">
@@ -125,7 +124,7 @@
 
     <div class="links-grid">
       <!-- Circular Link Buttons per category -->
-      <div *ngFor="let l of visibleLinks(cat._id!)" class="link-circle">
+      <div *ngFor="let l of visibleLinks(getId(cat._id))" class="link-circle">
         <button class="circle-link-button" (click)="window.open(decodeUrl(l.hashedUrl), '_blank')">
           <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
         </button>
@@ -135,10 +134,10 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #linkMenu="matMenu">
-          <button mat-menu-item (click)="openEditLink(cat._id!, l)">
+          <button mat-menu-item (click)="openEditLink(getId(cat._id), l)">
             Edit
           </button>
-          <button mat-menu-item (click)="deleteLink(cat._id!, l)">
+          <button mat-menu-item (click)="deleteLink(getId(cat._id), l)">
             Remove
           </button>
         </mat-menu>
@@ -155,11 +154,11 @@
 
     <div
       class="see-more"
-      *ngIf="visibleLinks(cat._id!).length < (linksMap[cat._id!]?.length || 0)"
+      *ngIf="visibleLinks(getId(cat._id)).length < (linksMap[getId(cat._id)]?.length || 0)"
     >
-      <button mat-button (click)="seeMore(cat._id!)">See more</button>
+      <button mat-button (click)="seeMore(getId(cat._id))">See more</button>
     </div>
-  </section>
+  </div>
 
   <!-- Floating Add Category Box -->
   <div class="floating-position">

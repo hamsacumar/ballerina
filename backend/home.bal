@@ -2,10 +2,12 @@ import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
 import ballerinax/mongodb;
+import ballerina/data.jsondata;
+import ballerina/io;
 
 //  ========== Type definitions ===========
 public type Category record {|
-    json _id?;
+     map<string> _id?;
     string name;
     json userId;
     string[] links?;
@@ -271,35 +273,53 @@ service /api on new http:Listener(9094) {
 
     // ========= Get all categories for authenticated user ==========
     resource function get categories(@http:Header string Authorization)
-            returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
+        returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
-        map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
-        if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
-            return userIdResult;
-        }
-        if userIdResult is error {
-            return <http:InternalServerError>{body: {"message": "Authentication failed: " + userIdResult.toString()}};
-        }
-
-        map<json> userId = <map<json>>userIdResult;
-
-        do {
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-
-            // Proper query with userId ObjectId
-            stream<record {|anydata...;|}, error?> categoryStream =
-                check categoryCollection->find({userId: userId});
-
-            json[] categories = [];
-            check categoryStream.forEach(function(record {|anydata...;|} category) {
-                categories.push(<json>category.cloneReadOnly());
-            });
-
-            return categories;
-        } on fail var e {
-            return <http:InternalServerError>{body: {"message": "Failed to retrieve categories: " + e.toString()}};
-        }
+    map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
+    if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
+        return userIdResult;
     }
+    if userIdResult is error {
+        return <http:InternalServerError>{body: {"message": "Authentication failed: " + userIdResult.toString()}};
+    }
+
+    map<json> userId = <map<json>>userIdResult;
+
+    do {
+        mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+
+        // Use aggregation with correct type - map<json>[] instead of json[]
+        map<json>[] pipeline = [
+            {"$match": {userId: userId}},
+            {"$project": {
+                "_id": 1,
+                "name": 1,
+                "userId": 1,
+                "links": 1,
+                "createdAt": 1,
+                "updatedAt": 1
+            }}
+        ];
+
+        stream<record {|anydata...;|}, error?> categoryStream =
+            check categoryCollection->aggregate(pipeline);
+
+        json[] categories = [];
+        check categoryStream.forEach(function(record {|anydata...;|} category) {
+            // Debug to see if _id is now included
+            io:println("Aggregation keys: ", category.keys());
+            
+            json|error categoryJson = jsondata:toJson(category);
+            if categoryJson is json {
+                categories.push(categoryJson);
+            }
+        });
+
+        return categories;
+    } on fail var e {
+        return <http:InternalServerError>{body: {"message": "Failed to retrieve categories: " + e.toString()}};
+    }
+}
 
     // ========= Update a category ==========
     resource function put categories/[string categoryId](@http:Header string Authorization, CategoryUpdate updateData)

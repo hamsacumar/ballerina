@@ -1,3 +1,12 @@
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body{
+    background-color: #fbfbfb;
+}
+
+
+
 /* ==================== Global Dark Mode ==================== */
 body.dark-mode,
 body.dark-mode .home-container {
@@ -12,7 +21,7 @@ body.dark-mode footer.footer {
 }
 
 body.dark-mode .home-container .header1-text h1 {
-  color: #bafd02aa; /* neon green shade */
+  color: #5d7e02; /* neon green shade */
 }
 
 body.dark-mode .home-container .header1-text p {
@@ -21,7 +30,7 @@ body.dark-mode .home-container .header1-text p {
 
 /* ==================== Category Section ==================== */
 body.dark-mode .home-container .category-header h2 {
-  color: #bafd02aa;
+  color: #5d7e02;
 }
 
 body.dark-mode .home-container .category-block {
@@ -35,13 +44,14 @@ body.dark-mode .link-name {
 
 /* ==================== Circular Link Buttons ==================== */
 body.dark-mode .circle-link-button {
-  background-color: #2e2e2e;
-  border: 1px solid #444;
+  background-color: #272626;
+  border: 1px solid #1d1c1c;
+  
 }
 
 body.dark-mode .circle-link-button:hover {
-  border-color: #bafd02aa;
-  box-shadow: 0 4px 12px rgba(186, 253, 2, 0.3);
+  border-color: #131413;
+  box-shadow: 0 4px 12px rgba(1, 1, 1, 0.3);
 }
 
 body.dark-mode .circle-link-button img {
@@ -50,7 +60,7 @@ body.dark-mode .circle-link-button img {
 
 /* ==================== See More Button ==================== */
 body.dark-mode .see-more button {
-  background-color: #5d7e02;
+  background-color: #5d7e02 !important;
   color: #fff;
 }
 
@@ -60,12 +70,12 @@ body.dark-mode .see-more button:hover {
 
 /* ==================== Add Box (Link & Category) ==================== */
 body.dark-mode .add-box {
-  background-color: #111;
-  border: 1px solid #444;
+  background-color: #313030;
+  border: 1px solid #222121;
 }
 
 body.dark-mode .add-box .circle-icon {
-  background-color: #5d7e02;
+  background-color: #5d7e02 !important;
 }
 
 body.dark-mode .add-box .button-text {
@@ -80,7 +90,7 @@ body.dark-mode .search-container {
 }
 
 body.dark-mode .search-input-container {
-  border: 1px solid #7ca902;
+  border: 1px solid #5d7e02 !important;
   background-color: #2e2e2e;
 }
 
@@ -91,12 +101,12 @@ body.dark-mode .search-input {
 
 body.dark-mode .search-button {
   background-color: #333;
-  color: #bafd02aa;
-  border-left: 1px solid #7ca902;
+  color: #5d7e02;
+  border-left: 1px solid #5d7e02;
 }
 
 body.dark-mode .search-button:hover {
-  background-color: #7ca902;
+  background-color: #5d7e02;
   color: #fff;
 }
 
@@ -123,11 +133,11 @@ body.dark-mode .result-btn.category-btn {
 
 body.dark-mode .result-btn.category-btn:hover {
   background: #3a3a3a;
-  border-color: #bafd02aa;
+  border-color: #5d7e02;
 }
 
 body.dark-mode .circle-button {
-  background: #2e2e2e;
+  background: #1e1e1e;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.6);
 }
 
@@ -170,3 +180,121 @@ body.dark-mode .no-results {
 
     background-color: #232222
   }
+  
+
+
+
+  /* ==================== Angular Material Menu Dark Mode ==================== */
+body.dark-mode .mat-mdc-menu-panel {
+  background-color: #2e2e2e !important; 
+  color: #ffffff !important; 
+  border: 1px solid #444;
+}
+
+body.dark-mode .mat-mdc-menu-item {
+  color: #ffffff !important; 
+}
+body.dark-mode .mat-mdc-menu-item:hover {
+  background-color: #3a3a3a !important; /* Hover effect */
+}
+
+body.dark-mode .mat-icon {
+  color: #ffffff; /* Icons inside menu or buttons */
+}
+
+
+/* ==================== Angular Material Dialog Dark Mode ==================== */
+body.dark-mode .mat-mdc-dialog-container {
+  --mdc-dialog-container-color: #2e2e2e !important;
+  --mdc-dialog-subhead-color: #d3cdcd !important;
+  --mdc-dialog-supporting-text-color: #d3cdcd !important;
+  background-color: #2e2e2e !important;
+  color: #d3cdcd !important;
+}
+
+body.dark-mode .mat-mdc-dialog-title {
+  color: #bafd02aa !important;
+  padding: 20px 24px 10px !important;
+}
+
+body.dark-mode .mat-mdc-dialog-content {
+  padding: 10px 24px !important;
+}
+
+body.dark-mode .mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: #3a3a3a !important;
+  --mdc-filled-text-field-input-text-color: #f5f5f5 !important;
+  --mdc-filled-text-field-label-text-color: #bafd02aa !important;
+  --mdc-filled-text-field-focus-label-text-color: #bafd02aa !important;
+  --mdc-filled-text-field-active-indicator-color: #bafd02aa !important;
+  --mdc-filled-text-field-focus-active-indicator-color: #bafd02aa !important;
+  --mdc-filled-text-field-hover-active-indicator-color: #bafd02aa !important;
+  --mdc-filled-text-field-caret-color: #bafd02aa !important;
+  --mat-form-field-focus-select-arrow-color: #bafd02aa !important;
+}
+
+body.dark-mode .mat-mdc-input-element {
+  caret-color: #bafd02aa !important;
+}
+
+body.dark-mode .mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+
+body.dark-mode .mat-mdc-form-field .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: #3a3a3a !important;
+}
+
+body.dark-mode .mat-mdc-form-field .mdc-text-field:not(.mdc-text-field--disabled) .mdc-floating-label {
+  color: #bafd02aa !important;
+}
+
+body.dark-mode .mat-mdc-form-field .mdc-text-field:not(.mdc-text-field--disabled) .mdc-line-ripple::after {
+  border-bottom-color: #bafd02aa !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions {
+  padding: 16px 24px !important;
+  border-top: 1px solid #444 !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions .mat-mdc-button {
+  color: #f5f5f5 !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions .mat-mdc-stroked-button:not(:disabled) {
+  --mdc-outlined-button-outline-color: #bafd02aa !important;
+  --mdc-outlined-button-label-text-color: #bafd02aa !important;
+  border-color: #bafd02aa !important;
+  color: #bafd02aa !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions .mat-mdc-stroked-button:hover:not(:disabled) {
+  background-color: rgba(186, 253, 2, 0.1) !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions .mat-mdc-flat-button:not(:disabled) {
+  --mdc-filled-button-container-color: #5d7e02 !important;
+  --mdc-filled-button-label-text-color: white !important;
+  background-color: #5d7e02 !important;
+  color: white !important;
+}
+
+body.dark-mode .mat-mdc-dialog-actions .mat-mdc-flat-button:hover:not(:disabled) {
+  --mdc-filled-button-hover-state-layer-color: #7ca902 !important;
+  background-color: #7ca902 !important;
+}
+
+/* Fix for input placeholder color */
+body.dark-mode .mat-mdc-input-element::placeholder {
+  color: #888 !important;
+}
+
+/* Fix for input autofill background */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover, 
+body.dark-mode input:-webkit-autofill:focus, 
+body.dark-mode input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #3a3a3a inset !important;
+  -webkit-text-fill-color: #f5f5f5 !important;
+}

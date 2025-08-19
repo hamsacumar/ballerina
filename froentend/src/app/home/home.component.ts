@@ -47,10 +47,12 @@ export class HomeComponent implements OnInit {
 
   // ====================== CATEGORIES & LINKS ======================
   categories: Category[] = [];
-  linksMap: Record<string, Link[]> = {};  
-  visibleCount: Record<string, number> = {}; 
+  linksMap: Record<string, Link[]> = {};
+  visibleCount: Record<string, number> = {};
   loading = { categories: false, links: {} as Record<string, boolean> };
   window = window;
+  categoryIds: string[] = []; // Store IDs from printCategoryIds
+
 
   constructor(
     private dialog: MatDialog,
@@ -58,18 +60,150 @@ export class HomeComponent implements OnInit {
     private linkService: LinkService,
     private authService: AuthService,
     private searchService: SearchService
-  ) {}
+  ) { }
 
   // ====================== LIFECYCLE ======================
+
   ngOnInit() {
-    this.loadCategories();
+    console.log('ngOnInit started');
     this.visibleCount['all'] = 6;
+    this.visibleCount['uncategorized'] = 6;
+
+    this.loadCategories();
+
+    this.printCategoryIds();
+    this.fetchCategories();
+
+    // Somewhere in your component, e.g., ngOnInit or after loading categories
+    this.categoryService.getAllIds().subscribe({
+      next: (ids: string[]) => {
+        console.log('All category IDs from service:', ids);
+      },
+      error: (err) => {
+        console.error('Failed to fetch category IDs from service:', err);
+      }
+    });
+
+    this.categoryService.getAll().subscribe({
+      next: (cats: Category[]) => {
+        console.log('All categories IDs22 from service:', cats);
+
+        // Now get all IDs
+        this.categoryService.getAllIds().subscribe({
+          next: (ids: string[]) => console.log('All category IDs:', ids),
+          error: (err) => console.error('Failed to fetch IDs:', err)
+        });
+      },
+      error: (err) => console.error('Failed to fetch categories:', err)
+    });
+
+
 
     this.authService.getProfile().subscribe({
       next: (profile) => console.log('User Profile:', profile),
       error: (err) => console.error('Failed to load profile:', err),
     });
   }
+
+  fetchCategories() {
+    this.categoryService.getAll().subscribe((data: Category[]) => {
+      this.categories = data;
+      console.log('Fetched categories:', this.categories);
+    });
+  }
+  
+
+  
+  printCategoryIds() {
+    console.log('Fetching category IDs...');
+
+    // Use the service method that already extracts IDs
+    this.categoryService.getAllIds().subscribe({
+      next: (ids) => {
+        console.log('Category IDs fetched:', ids);
+        this.categoryIds = ids;
+
+        // Load links for each category
+        this.categoryIds.forEach(id => {
+          if (id) {
+            console.log('Loading links for category:', id);
+            this.loadLinks(id);
+          } else {
+            console.warn('Category ID is undefined, skipping.');
+          }
+        });
+      },
+      error: (err) => console.error('Error fetching category IDs:', err)
+    });
+  }
+
+
+
+
+
+
+  loadLinks(categoryId: string) {
+    console.log(`Loading links for category: ${categoryId}`);
+    this.loading.links[categoryId] = true;
+
+    const fetch$ =
+      categoryId === 'categorized'
+        ? this.linkService.getByCategory('uncategorized')
+        : this.linkService.getByCategory(categoryId);
+
+    fetch$.subscribe({
+      next: (links: any[]) => {
+        console.log(`Links fetched for ${categoryId}:`, links);
+        this.linksMap[categoryId] = links.map(link => ({
+          ...link,
+          _id: (link._id as any)?.$oid || link._id,
+          categoryId: (link.categoryId as any)?.$oid || link.categoryId
+        }));
+        this.loading.links[categoryId] = false;
+      },
+      error: (err) => {
+        console.error(`Failed to load links for category ${categoryId}:`, err);
+      }
+    });
+  }
+
+  loadCategories() {
+    console.log('Loading categories...');
+    this.loading.categories = true;
+
+    this.categoryService.getAll().subscribe({
+      next: (cats: any[]) => {
+        console.log('Categories fetched:', cats);
+        this.categories = cats.map(cat => ({
+          ...cat,
+          _id: (cat._id as any)?.$oid || cat._id,
+          userId: (cat.userId as any)?.$oid || cat.userId
+        }));
+
+        console.log('Starting to load links for category IDs:', this.categoryIds);
+        this.categoryIds.forEach(catId => {
+          this.visibleCount[catId] = 6;
+          if (catId) {
+            this.loadLinks(catId);
+          } else {
+            console.warn('Invalid category ID:', catId);
+          }
+        });
+
+        this.loading.categories = false;
+      },
+      error: (err) => {
+        console.error('Failed to load categories:', err);
+        this.loading.categories = false;
+      },
+    });
+
+    this.loadAllLinks();
+  }
+
+
+
+
 
   // ====================== SEARCH METHODS ======================
   handleSearch() {
@@ -111,43 +245,17 @@ export class HomeComponent implements OnInit {
   }
 
   openCategory(cat: Category) {
-  const el = document.getElementById(cat._id as string);
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    console.warn('Category element not found:', cat._id);
+    const el = document.getElementById(cat._id as string);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.warn('Category element not found:', cat._id);
+    }
   }
-}
 
 
   // ====================== CATEGORY METHODS ======================
-  loadCategories() {
-    this.loading.categories = true;
 
-    this.categoryService.getAll().subscribe({
-      next: (cats: any[]) => {
-        this.categories = cats.map(cat => ({
-          ...cat,
-          _id: (cat._id as any)?.$oid || cat._id,
-          userId: (cat.userId as any)?.$oid || cat.userId
-        }));
-
-        this.categories.forEach(cat => {
-          const catId = cat._id || '';
-          this.visibleCount[catId] = 6;
-          if (catId) this.loadLinks(catId);
-        });
-
-        this.loading.categories = false;
-      },
-      error: (err) => {
-        console.error('Failed to load categories:', err);
-        this.loading.categories = false;
-      },
-    });
-
-    this.loadAllLinks();
-  }
 
   openAddCategoryDialog() {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
@@ -168,12 +276,22 @@ export class HomeComponent implements OnInit {
   openEditCategory(cat: Category) {
     const dialogRef = this.dialog.open(AddCategoryDialogComponent, {
       width: '400px',
-      data: { mode: 'edit', name: cat.name, id: cat._id },
+      data: {
+        mode: 'edit',
+        id: this.getId(cat._id),
+        name: cat.name,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.categoryService.update(cat._id!, { name: result.name }).subscribe({
+        const categoryId = this.getId(cat._id);
+        if (!categoryId) {
+          console.error('Invalid category ID');
+          return;
+        }
+
+        this.categoryService.update(categoryId, { name: result.name }).subscribe({
           next: () => this.loadCategories(),
           error: (err) => console.error('Failed to update category:', err),
         });
@@ -181,14 +299,15 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  deleteCategory(cat: Category) {
-    const catId = (cat._id as any)?.$oid || cat._id;
-    if (!catId) return console.error('Missing category ID');
 
-    if (confirm(`Delete category "${cat.name}"?`)) {
-      this.categoryService.remove(catId).subscribe({
+  deleteCategory(cat: Category) {
+    const categoryId = this.getId(cat._id);
+    if (!categoryId) return console.error('Missing category ID');
+
+    if (confirm(`Delete category "${cat.name}" and all its links?`)) {
+      this.categoryService.remove(categoryId).subscribe({
         next: () => {
-          this.categories = this.categories.filter(c => ((c._id as any)?.$oid || c._id) !== catId);
+          this.categories = this.categories.filter(c => ((c._id as any)?.$oid || c._id) !== categoryId);
           this.loadAllLinks();
         },
         error: (err) => console.error('Failed to delete category:', err)
@@ -211,29 +330,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  loadLinks(categoryId: string) {
-    this.loading.links[categoryId] = true;
 
-    const fetch$ =
-      categoryId === 'categorized'
-        ? this.linkService.getByCategory('uncategorized')
-        : this.linkService.getByCategory(categoryId);
-
-    fetch$.subscribe({
-      next: (links: any[]) => {
-        this.linksMap[categoryId] = links.map(link => ({
-          ...link,
-          _id: (link._id as any)?.$oid || link._id,
-          categoryId: (link.categoryId as any)?.$oid || link.categoryId
-        }));
-        this.loading.links[categoryId] = false;
-      },
-      error: (err) => {
-        console.error(`Failed to load links for category ${categoryId}:`, err);
-        this.loading.links[categoryId] = false;
-      }
-    });
-  }
 
   visibleLinks(categoryId: string): Link[] {
     const allLinks = Array.isArray(this.linksMap[categoryId])
@@ -253,7 +350,7 @@ export class HomeComponent implements OnInit {
       width: '400px',
       data: {
         mode: 'create',
-        categoryId: cat?._id ?? null, // ✅ Pass the actual category ID
+        categoryId: cat?._id ? this.getId(cat._id) : null,
       },
     });
 
@@ -332,6 +429,12 @@ export class HomeComponent implements OnInit {
       console.error('Failed to decode URL:', error);
       return 'https://google.com'; // Fallback URL
     }
+  }
+
+  // Helper method to safely extract ID from string or { $oid: string }
+  public getId(id: string | { $oid: string } | undefined): string {
+    if (!id) return '';
+    return typeof id === 'string' ? id : id.$oid;
   }
 
   // Method to safely open links
