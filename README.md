@@ -1,6 +1,6 @@
 # My Website
 
-![My Website Logo](public/logo.png)  <!-- Replace with your logo path or URL -->
+![My Website Logo](/froentend/public/logo.png)  <!-- Replace with your logo path or URL -->
 
 This project is a secure web application where users can register, log in, and manage links categorized according to their preferences. Security is a key focus, with encryption and hashing applied to sensitive data.
 
