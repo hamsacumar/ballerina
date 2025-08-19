@@ -2,10 +2,12 @@ import ballerina/http;
 import ballerina/jwt;
 import ballerina/time;
 import ballerinax/mongodb;
+import ballerina/data.jsondata;
+import ballerina/io;
 
 //  ========== Type definitions ===========
 public type Category record {|
-    json _id?;
+     map<string> _id?;
     string name;
     json userId;
     string[] links?;
@@ -271,35 +273,53 @@ service /api on new http:Listener(9094) {
 
     // ========= Get all categories for authenticated user ==========
     resource function get categories(@http:Header string Authorization)
-            returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
+        returns json[]|http:InternalServerError|http:Unauthorized|http:Forbidden {
 
-        map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
-        if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
-            return userIdResult;
-        }
-        if userIdResult is error {
-            return <http:InternalServerError>{body: {"message": "Authentication failed: " + userIdResult.toString()}};
-        }
-
-        map<json> userId = <map<json>>userIdResult;
-
-        do {
-            mongodb:Collection categoryCollection = check myDb->getCollection("categories");
-
-            // Proper query with userId ObjectId
-            stream<record {|anydata...;|}, error?> categoryStream =
-                check categoryCollection->find({userId: userId});
-
-            json[] categories = [];
-            check categoryStream.forEach(function(record {|anydata...;|} category) {
-                categories.push(<json>category.cloneReadOnly());
-            });
-
-            return categories;
-        } on fail var e {
-            return <http:InternalServerError>{body: {"message": "Failed to retrieve categories: " + e.toString()}};
-        }
+    map<json>|http:Unauthorized|http:Forbidden|error userIdResult = self.verifyTokenAndGetUserId(Authorization);
+    if userIdResult is http:Unauthorized || userIdResult is http:Forbidden {
+        return userIdResult;
     }
+    if userIdResult is error {
+        return <http:InternalServerError>{body: {"message": "Authentication failed: " + userIdResult.toString()}};
+    }
+
+    map<json> userId = <map<json>>userIdResult;
+
+    do {
+        mongodb:Collection categoryCollection = check myDb->getCollection("categories");
+
+        // Use aggregation with correct type - map<json>[] instead of json[]
+        map<json>[] pipeline = [
+            {"$match": {userId: userId}},
+            {"$project": {
+                "_id": 1,
+                "name": 1,
+                "userId": 1,
+                "links": 1,
+                "createdAt": 1,
+                "updatedAt": 1
+            }}
+        ];
+
+        stream<record {|anydata...;|}, error?> categoryStream =
+            check categoryCollection->aggregate(pipeline);
+
+        json[] categories = [];
+        check categoryStream.forEach(function(record {|anydata...;|} category) {
+            // Debug to see if _id is now included
+            io:println("Aggregation keys: ", category.keys());
+            
+            json|error categoryJson = jsondata:toJson(category);
+            if categoryJson is json {
+                categories.push(categoryJson);
+            }
+        });
+
+        return categories;
+    } on fail var e {
+        return <http:InternalServerError>{body: {"message": "Failed to retrieve categories: " + e.toString()}};
+    }
+}
 
     // ========= Update a category ==========
     resource function put categories/[string categoryId](@http:Header string Authorization, CategoryUpdate updateData)
@@ -572,21 +592,38 @@ service /api on new http:Listener(9094) {
         do {
             mongodb:Collection linkCollection = check myDb->getCollection("links");
 
-            // Get all links for the user
+            // Use aggregation to include _id field
+            map<json>[] pipeline = [
+                {"$match": {userId: userId}},
+                {"$project": {
+                    "_id": 1,
+                    "name": 1,
+                    "hashedUrl": 1,
+                    "icon": 1,
+                    "categoryId": 1,
+                    "userId": 1,
+                    "createdAt": 1,
+                    "updatedAt": 1
+                }}
+            ];
+
             stream<record {|anydata...;|}, error?> linkStream =
-            check linkCollection->find({userId: userId});
+                check linkCollection->aggregate(pipeline);
 
             json[] categorizedLinks = [];
             json[] uncategorizedLinks = [];
 
             check linkStream.forEach(function(record {|anydata...;|} link) {
-                json linkJson = <json>link.cloneReadOnly();
-                anydata categoryIdData = link["categoryId"];
+                json|error linkJsonResult = jsondata:toJson(link);
+                if linkJsonResult is json {
+                    json linkJson = linkJsonResult;
+                    anydata categoryIdData = link["categoryId"];
 
-                if (categoryIdData is () || categoryIdData == ()) {
-                    uncategorizedLinks.push(linkJson);
-                } else {
-                    categorizedLinks.push(linkJson);
+                    if (categoryIdData is () || categoryIdData == ()) {
+                        uncategorizedLinks.push(linkJson);
+                    } else {
+                        categorizedLinks.push(linkJson);
+                    }
                 }
             });
 
@@ -655,36 +692,62 @@ service /api on new http:Listener(9094) {
         do {
             mongodb:Collection linkCollection = check myDb->getCollection("links");
 
+            map<json>[] pipeline;
+
             if (categoryId == "uncategorized") {
-                // Handle special case for uncategorized links
-                stream<record {|anydata...;|}, error?> linkStream =
-                check linkCollection->find({
-                    userId: userId,
-                    "$or": [
-                        {"categoryId": ()},
-                        {"categoryId": {"$exists": false}}
-                    ]
-                });
-
-                json[] links = [];
-                check linkStream.forEach(function(record {|anydata...;|} link) {
-                    links.push(<json>link.cloneReadOnly());
-                });
-
-                return links;
+                // Handle special case for uncategorized links - use aggregation
+                pipeline = [
+                    {"$match": {
+                        "userId": userId,
+                        "$or": [
+                            {"categoryId": null},
+                            {"categoryId": {"$exists": false}}
+                        ]
+                    }},
+                    {"$project": {
+                        "_id": 1,
+                        "name": 1,
+                        "hashedUrl": 1,
+                        "icon": 1,
+                        "categoryId": 1,
+                        "userId": 1,
+                        "createdAt": 1,
+                        "updatedAt": 1
+                    }}
+                ];
             } else {
-                // Normal category lookup
+                // Normal category lookup - use aggregation
                 map<json> categoryObjectId = self.createObjectId(categoryId);
-                stream<record {|anydata...;|}, error?> linkStream =
-                check linkCollection->find({categoryId: categoryObjectId, userId: userId});
-
-                json[] links = [];
-                check linkStream.forEach(function(record {|anydata...;|} link) {
-                    links.push(<json>link.cloneReadOnly());
-                });
-
-                return links;
+                pipeline = [
+                    {"$match": {
+                        "categoryId": categoryObjectId,
+                        "userId": userId
+                    }},
+                    {"$project": {
+                        "_id": 1,
+                        "name": 1,
+                        "hashedUrl": 1,
+                        "icon": 1,
+                        "categoryId": 1,
+                        "userId": 1,
+                        "createdAt": 1,
+                        "updatedAt": 1
+                    }}
+                ];
             }
+
+            stream<record {|anydata...;|}, error?> linkStream =
+                check linkCollection->aggregate(pipeline);
+
+            json[] links = [];
+            check linkStream.forEach(function(record {|anydata...;|} link) {
+                json|error linkJsonResult = jsondata:toJson(link);
+                if linkJsonResult is json {
+                    links.push(linkJsonResult);
+                }
+            });
+
+            return links;
         } on fail var e {
             return <http:InternalServerError>{body: {"message": "Failed to retrieve links: " + e.toString()}};
         }

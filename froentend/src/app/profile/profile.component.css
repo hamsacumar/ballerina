@@ -1,7 +1,7 @@
 .profile-container {
   background: #f9f9f9;
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   padding: 16px;
   max-width: 280px;
   width: 280px;
@@ -552,10 +552,13 @@
 /* Logout Section */
 .logout-section {
   border-bottom: none;
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 30px;
+  padding-top: 10px;
   border-top: 1px solid #e0e0e0;
   margin-bottom: 0;
+  display: flex;              
+  justify-content: center;    
+  width: 100%;                
 }
 
 .logout-btn {
@@ -565,14 +568,15 @@
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
-  width: 100%;
+  width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  align-items: center;
 }
 
 .logout-btn:hover {
