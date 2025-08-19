@@ -619,22 +619,63 @@ resource function get monthlyBarChart() returns json|http:InternalServerError {
             int categoryCount = categoriesMonthlyCount[month] ?: 0;
             int userCount = usersMonthlyCount[month] ?: 0;
 
-            json monthData = {
-                "x": self.getMonthName(month),
-                "month": month,
-                "links": linkCount,
-                "categories": categoryCount,
-                "users": userCount,
-                "total": linkCount + categoryCount + userCount,
-                "isCurrent": month == currentMonth
-            };
-            chartData.push(monthData);
+            // Parse YYYY-MM format to separate year and month
+            string:RegExp separator = re `-`;
+            string[] parts = separator.split(month);
+            
+            if parts.length() == 2 {
+                int yearNum = check int:fromString(parts[0]);
+                int monthNum = check int:fromString(parts[1]);
+                
+                // Get month name from number
+                string monthName = "";
+                if monthNum == 1 {
+                    monthName = "January";
+                } else if monthNum == 2 {
+                    monthName = "February";
+                } else if monthNum == 3 {
+                    monthName = "March";
+                } else if monthNum == 4 {
+                    monthName = "April";
+                } else if monthNum == 5 {
+                    monthName = "May";
+                } else if monthNum == 6 {
+                    monthName = "June";
+                } else if monthNum == 7 {
+                    monthName = "July";
+                } else if monthNum == 8 {
+                    monthName = "August";
+                } else if monthNum == 9 {
+                    monthName = "September";
+                } else if monthNum == 10 {
+                    monthName = "October";
+                } else if monthNum == 11 {
+                    monthName = "November";
+                } else if monthNum == 12 {
+                    monthName = "December";
+                } else {
+                    monthName = monthNum.toString();
+                }
+
+                json monthData = {
+                    "year": yearNum,
+                    "month": monthName,
+                    "monthNumber": monthNum,
+                    "yearMonth": month, // Keep original for reference
+                    "links": linkCount,
+                    "categories": categoryCount,
+                    "users": userCount,
+                    "total": linkCount + categoryCount + userCount,
+                    "isCurrent": month == currentMonth
+                };
+                chartData.push(monthData);
+            }
         }
 
         return {
             "chartData": chartData,
             "chartConfig": {
-                "xAxisKey": "x",
+                "xAxisKey": "month",
                 "dataKeys": ["links", "categories", "users"],
                 "colors": {
                     "links": "#F4A460",

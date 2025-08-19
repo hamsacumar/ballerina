@@ -12,6 +12,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../app/guard/auth.guard';
 import { MonthlyBarChartComponent } from './monthly-bar-chart/monthly-bar-chart.component';
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -37,6 +38,7 @@ export const routes: Routes = [
   { path: 'footer', component: FooterComponent },
   { path: 'add-link', component: AddLinkDialogComponent },
   { path: 'monthly-bar-chart', component: MonthlyBarChartComponent },
+  { path: '', redirectTo: 'monthly-bar-chart', pathMatch: 'full' },
   { path: '**', redirectTo: '' }, // Catch-all route
  
   { path: 'profile', component: ProfileComponent },

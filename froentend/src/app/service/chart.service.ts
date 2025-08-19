@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MonthlyChartData } from '../model/monthly-chart-data.model';
+import { ChartResponse } from '../model/monthly-chart-data.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChartService {
-  private apiUrl = 'http://localhost:9093/admin/monthlyBarChart'; // your Ballerina API
+  private apiUrl = 'http://localhost:9093/admin/monthlyBarChart';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getMonthlyChartData(): Observable<{ chartData: MonthlyChartData[], chartConfig: any, message: string }> {
-    return this.http.get<{ chartData: MonthlyChartData[], chartConfig: any, message: string }>(this.apiUrl);
+  getMonthlyChartData(year: number): Observable<ChartResponse> {
+    return this.http.get<ChartResponse>(`${this.apiUrl}?year=${year}`);
   }
 }

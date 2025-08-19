@@ -1,131 +1,134 @@
-/* Container */
 .container {
   max-width: 1200px;
-  margin: 80px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: 20px auto;
+  padding: 0 15px;
+  margin-top: 100px;
 }
 
 .container h2 {
-  font-size: 22px;
-  font-weight: 600;
+  text-align: center;
+  font-size: 32px;
   margin-bottom: 20px;
-  color: #333;
+  color: #1fa025;
 }
 
-/* Search + Filter bar layout */
-app-search-bar,
-app-filter-bar {
+/* Button aligned to left */
+.btn-primary {
   display: inline-block;
-  width: 48%;
-  margin-bottom: 15px;
-}
-
-app-search-bar {
-  margin-right: 4%;
-}
-
-/* Alerts */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin: 15px 0;
+  margin-bottom: 5px;
+  background-color: #de2818;
+  color: white;
+  padding: 8px 12px;      /* slightly wider for better link look */
+  border-radius: 5px;
+  text-decoration: none;   /* removes underline */
   font-size: 14px;
+  transition: background 0.2s ease;
 }
 
-.alert-info {
-  background-color: #e8f4fd;
-  border: 1px solid #b6e0fe;
-  color: #31708f;
+.btn-primary:hover {
+  background-color: #149227;
 }
 
-.alert-danger {
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
-  color: #a94442;
+
+/* Filters section */
+.filters {
+  display: flex;
+  justify-content: flex-start; /* Align items to the left */
+  gap: 15px;                   /* Space between search & filter */
+  margin-bottom: 20px;
+  flex-wrap: wrap;              /* Wrap on smaller screens */
+  align-items: center;
 }
 
-/* User Table */
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 14px;
-  text-align: left;
-}
-
-.user-table th,
-.user-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #ddd;
-}
-
-.user-table th {
-  background-color: #f4f6f8;
-  font-weight: 600;
-  color: #333;
-}
-
-.user-table tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-.user-table tr:hover {
-  background-color: #f1f1f1;
-  transition: background-color 0.2s ease;
+/* Optional: style for child components if needed */
+.filters app-search-bar,
+.filters app-filter-bar {
+  flex: 1;                      /* Make them responsive */
+  min-width: 200px;             /* Minimum width */
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  /* Stack search + filter bars */
-  app-search-bar,
-  app-filter-bar {
+  .filters {
+    flex-direction: column;     /* Stack on small screens */
+    gap: 10px;
+  }
+}
+
+
+/* Table styling */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f9f9f9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.user-table thead {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 15px;
+  text-align:center;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Responsive: label on small screens */
+@media (max-width: 768px) {
+  .user-table, .user-table thead, .user-table tbody, .user-table th, .user-table td, .user-table tr {
     display: block;
-    width: 100%;
-    margin: 8px 0;
   }
 
-  /* Responsive table */
-  .user-table,
-  .user-table thead,
-  .user-table tbody,
-  .user-table th,
-  .user-table td,
-  .user-table tr {
-    display: block;
-    width: 100%;
-  }
-
-  .user-table thead {
+  .user-table thead tr {
     display: none;
   }
 
-  .user-table tr {
-    margin-bottom: 12px;
+  .user-table tbody tr {
+    margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 10px;
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
 
   .user-table td {
     display: flex;
     justify-content: space-between;
     padding: 8px;
-    border: none;
-    border-bottom: 1px solid #eee;
+    text-align: right;
   }
 
-  .user-table td:last-child {
-    border-bottom: none;
-  }
-
-  .user-table td:before {
+  .user-table td::before {
     content: attr(data-label);
-    font-weight: 600;
-    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
+    flex-basis: 50%;
+    text-align: left;
   }
+}
+
+/* Alerts */
+.alert {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
 }
