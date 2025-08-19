@@ -33,11 +33,10 @@ export class LinkService {
   }
 
   /** Update an existing link */
-  update(id: string, data: { name: string; url: string; categoryId?: string | null }): Observable<any> {
+  update(id: string, data: { name: string; url: string }): Observable<any> {
     const payload = {
       name: data.name,
       url: data.url,
-      categoryId: data.categoryId ?? null
     };
     return this.http.put(`${this.apiUrl}/${id}`, payload);
   }

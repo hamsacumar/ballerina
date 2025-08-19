@@ -15,6 +15,9 @@ import { CommonModule } from '@angular/common';
 import { ProfileService } from '../service/profile.service';
 import { ChangePasswordRequest, User } from '../model/profile.model';
 import { Output, EventEmitter } from '@angular/core';
+import { AuthService } from '../service/auth.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-profile',
@@ -28,6 +31,9 @@ export class ProfileComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private profileService = inject(ProfileService);
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   user: User | null = null;
   profileImageUrl: string = 'assets/images/default-avatar.png'; // Default avatar
@@ -334,9 +340,21 @@ export class ProfileComponent implements OnInit {
   @Output() closeModal = new EventEmitter<void>();
 
   logout(): void {
-    // Add your logout logic here
-    console.log('Logging out...');
-    this.closeModal.emit();
-    // Example: this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: (res) => {
+        console.log('Logout response:', res);
+  
+        // Clear token (if stored in localStorage/sessionStorage)
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+  
+        // Navigate back to login
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Logout failed:', err);
+      }
+    });
   }
+  
 }

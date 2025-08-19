@@ -3,6 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Category } from '../model/category.model';
 import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
+
+
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
@@ -46,4 +49,20 @@ export class CategoryService {
       headers: this.getAuthHeaders()
     });
   }
+
+/** Get all category IDs only */
+getAllIds(): Observable<string[]> {
+  return this.getAll().pipe(
+    map(categories =>
+      categories.map(cat => {
+        if (!cat._id) return '';               // fallback
+        return typeof cat._id === 'string' 
+          ? cat._id 
+          : cat._id.$oid ?? '';               // extract $oid if object
+      })
+    )
+  );
+}
+
+
 }

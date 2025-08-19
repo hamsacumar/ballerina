@@ -808,4 +808,35 @@ Your App Team
 
         return {"message": "Password updated successfully"};
     }
+
+    // Add this logout resource function to your existing service
+
+    resource function post logout(@http:Header string Authorization)
+        returns json|http:Unauthorized|http:Forbidden|error {
+
+        // Authenticate the user to ensure they have a valid token
+        jwt:Payload|http:Unauthorized authn = self.jwtHandler.authenticate(Authorization);
+        if authn is http:Unauthorized {
+            return authn;
+        }
+
+        http:Forbidden? authz = self.jwtHandler.authorize(<jwt:Payload>authn, ["admin", "user"]);
+        if authz is http:Forbidden {
+            return authz;
+        }
+
+        jwt:Payload payload = <jwt:Payload>authn;
+        string? username = <string?>payload["username"];
+
+        if username is () {
+            return error("Invalid token: missing username");
+        }
+
+        log:printInfo(string `User ${username} logged out successfully`);
+
+        return {
+            "message": "Logout successful",
+            "timestamp": time:utcNow()
+        };
+    }
 }
