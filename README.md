@@ -1,4 +1,4 @@
-# My Website
+# TabWallet
 
 ![My Website Logo](/froentend/public/logo.png)  <!-- Replace with your logo path or URL -->
 
