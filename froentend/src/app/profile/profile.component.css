@@ -76,7 +76,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #529511;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -86,9 +86,6 @@
   border: 3px solid #529511;
 }
 
-.image-container:hover .image-overlay {
-  opacity: 1;
-}
 
 .camera-icon {
   font-size: 18px;

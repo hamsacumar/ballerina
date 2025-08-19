@@ -246,3 +246,14 @@
     vertical-align: middle;
   }
 }
+
+
+/* profile button */
+.profile-btn-image {
+  width: 30px;          
+  height: 30px;         
+  border-radius: 50%;  
+  object-fit: cover;    
+  border: 1px solid #f0f3ed; 
+  display: block;
+}
