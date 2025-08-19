@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartService } from '../../service/chart.service';
+import { ChartService } from '../service/chart.service';
 import { MonthlyChartData } from '../model/monthly-chart-data.model';
 import { Chart, registerables } from 'chart.js';
 import { FormsModule } from '@angular/forms';  

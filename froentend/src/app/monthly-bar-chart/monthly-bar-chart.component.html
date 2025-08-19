@@ -1,0 +1,34 @@
+<app-header></app-header>
+
+<div class="head">
+  <button class="back-btn" (click)="goBack()">← Go Back</button>
+  <h1>Summary</h1>
+  <p>Visualize the monthly data for links, categories, and users.</p>
+
+  <!-- Year Dropdown -->
+  <label for="yearSelect">Select Year:</label>
+  <select id="yearSelect" [(ngModel)]="selectedYear" (change)="filterByYear(selectedYear, { labels: { links: 'Links', categories: 'Categories', users: 'Users' }, colors: { links: '#42A5F5', categories: '#66BB6A', users: '#FFA726' } })">
+    <option *ngFor="let year of availableYears" [value]="year">
+      {{ year }}
+    </option>
+  </select>
+</div>
+
+<div class="charts-wrapper">
+  <div class="chart-container">
+    <h3>Links Count</h3>
+    <canvas id="linksBarChartCanvas"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Categories Count</h3>
+    <canvas id="categoriesBarChartCanvas"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Users Count</h3>
+    <canvas id="usersBarChartCanvas"></canvas>
+  </div>
+</div>
+
+<app-footer></app-footer>
