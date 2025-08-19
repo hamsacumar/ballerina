@@ -96,7 +96,7 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #linkMenu="matMenu">
-          <button mat-menu-item (click)="openEditLink('all', l)">Edit</button>
+          <button mat-menu-item (click)="openEditLink( l)">Edit</button>
           <button mat-menu-item (click)="deleteLink('all', l)">Remove</button>
         </mat-menu>
       </div>
@@ -147,20 +147,19 @@
           <img [src]="l.icon || 'assets/default-favicon.png'" alt="" />
         </button>
         <div class="link-name">{{ l.name }}</div>
+    
         <!-- Menu button -->
-        <button mat-icon-button [matMenuTriggerFor]="linkMenu">
+        <button mat-icon-button [matMenuTriggerFor]="linkMenu" (click)="selectedLink = l">
           <mat-icon>more_vert</mat-icon>
         </button>
+    
+        <!-- Single shared menu -->
         <mat-menu #linkMenu="matMenu">
-          <button mat-menu-item (click)="openEditLink(getId(cat._id), l)">
-            Edit
-          </button>
-          <button mat-menu-item (click)="deleteLink(getId(cat._id), l)">
-            Remove
-          </button>
+          <button mat-menu-item (click)="openEditLink(selectedLink)">Edit</button>
+          <button mat-menu-item (click)="deleteLink(getId(cat._id), selectedLink)">Remove</button>
         </mat-menu>
       </div>
-
+    
       <!-- Add Link Box under each category -->
       <div class="add-box" (click)="openAddLinkDialog(cat)">
         <div class="circle-icon">
