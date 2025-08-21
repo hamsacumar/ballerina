@@ -112,9 +112,9 @@ export class HomeComponent implements OnInit {
       console.log('Fetched categories:', this.categories);
     });
   }
-  
 
-  
+
+
   printCategoryIds() {
     console.log('Fetching category IDs...');
 
@@ -137,10 +137,6 @@ export class HomeComponent implements OnInit {
       error: (err) => console.error('Error fetching category IDs:', err)
     });
   }
-
-
-
-
 
 
   loadLinks(categoryId: string) {
@@ -375,7 +371,7 @@ export class HomeComponent implements OnInit {
   }
 
   openEditLink(link: Link) {
-    console.log('Editing link:', link); 
+    console.log('Editing link:', link);
     console.log('Link ID:', link._id);
     const linkId = (link as any)._id || (link as any).id;  // fallback check
     console.log('Link ID:', linkId);
@@ -389,31 +385,34 @@ export class HomeComponent implements OnInit {
         url: originalUrl,
       },
     });
-  
+
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const payload = {
           name: result.name,
           url: result.url,
         };
-  
+
         this.linkService.update(linkId, payload).subscribe({
           next: () => {
             this.loadAllLinks();
+            if (link.categoryId) {
+              this.loadLinks(link.categoryId);
+            }
           },
           error: (err) => console.error('Failed to update link:', err),
         });
       }
     });
   }
-  
+
 
   deleteLink(catId: string, link: Link) {
     const linkId = (link._id as any)?.$oid || link._id;
     if (!linkId) return console.error('Missing link ID');
-  
+
     if (!confirm(`Delete link "${link.name}"?`)) return;
-  
+
     this.linkService.remove(linkId).subscribe({
       next: () => {
         console.log(`Link ${link.name} deleted`);
@@ -422,10 +421,10 @@ export class HomeComponent implements OnInit {
       error: (err) => console.error('Failed to delete link:', err),
     });
   }
-  
 
-  
-  
+
+
+
   // Add this method to your HomeComponent class
   decodeUrl(encodedUrl: string): string {
     try {
