@@ -10,6 +10,8 @@ import { UserListComponent } from './user-list/user-list.component';
 // import { HomeComponent } from './home/home.component';
 import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../app/guard/auth.guard';
+import { MonthlyBarChartComponent } from './monthly-bar-chart/monthly-bar-chart.component';
+
 
 export const routes: Routes = [
   {
@@ -35,8 +37,8 @@ export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
   { path: 'footer', component: FooterComponent },
   { path: 'add-link', component: AddLinkDialogComponent },
-  // { path: 'home', component:HomeComponent },
-  
+  { path: 'monthly-bar-chart', component: MonthlyBarChartComponent },
+  { path: '', redirectTo: 'monthly-bar-chart', pathMatch: 'full' },
   { path: '**', redirectTo: '' }, // Catch-all route
  
   { path: 'profile', component: ProfileComponent },
