@@ -51,8 +51,8 @@ body.dark-mode .circle-link-button {
 }
 
 body.dark-mode .circle-link-button:hover {
-  border-color: #131413;
-  box-shadow: 0 4px 12px #5d7e02;
+  border-color: #5d7e02;
+  box-shadow: 0 4px 12px rgba(1, 1, 1, 0.3);
 }
 
 body.dark-mode .circle-link-button img {

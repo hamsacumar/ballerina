@@ -646,7 +646,7 @@ Your App Team
         string hashedPassword = check self.hashPassword("admin123");
 
         User adminUser = {
-            username: "admin",
+            username: "Logasini",
             email: "admin@example.com",
             password: hashedPassword,
             role: "admin",

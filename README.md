@@ -1,6 +1,6 @@
 # TabWallet
 
-![My Website Logo](/froentend/public/logo.png)  <!-- Replace with your logo path or URL -->
+![My Website Logo](/froentend/public/logo.png)  
 
 This project is a secure web application where users can register, log in, and manage links categorized according to their preferences. Security is a key focus, with encryption and hashing applied to sensitive data.
 
@@ -39,6 +39,11 @@ This project is a secure web application where users can register, log in, and m
 
 4. **Updating Credentials**
    - Change your username or password from your profile settings.
+
+5. **Username: Logasini**
+   **Password: admin123**
+   - Use this Username and password to get into
+   Admin dashboard.
 
 ## Security Notes
 
